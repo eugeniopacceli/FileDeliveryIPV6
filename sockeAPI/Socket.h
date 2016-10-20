@@ -30,9 +30,16 @@
 #ifndef __SOCKET_H
 #define __SOCKET_H
 
-#include <string>            // For string
-#include <exception>         // For exception class
-
 using namespace std;
+
+class Socket {
+
+public:
+
+private:
+
+protected:
+
+}
 
 #endif

@@ -26,9 +26,10 @@
 *
 * @discription:
 */
-
-#include "SocketExpection.h"
+/*
 #include "Socket.h"
+*/
+#include "SocketException.h"
 
 #include <sys/types.h>      
 #include <sys/socket.h>     
@@ -37,5 +38,29 @@
 #include <unistd.h>          
 #include <netinet/in.h>      
 #include <errno.h>           
+#include <cstring>
+#include <iostream>
 
-using namespace std;
+//SocketException code
+/***********************************************************************/
+
+SocketException::SocketException(const string& message, bool inclSysMsg) 
+	throw(): errorMessage(message) {
+	if(inclSysMsg) {
+		errorMessage.append(": ");
+		errorMessage.append(strerror(errno));
+	}
+}
+
+SocketException::~SocketException() throw() {}
+
+const char* SocketException::what() const throw() {
+	return errorMessage.c_str();
+} 
+
+/***********************************************************************/
+
+//Socket code
+/***********************************************************************/
+
+/***********************************************************************/

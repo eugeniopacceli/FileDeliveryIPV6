@@ -1,5 +1,4 @@
 /* vim: set noet ts=4 sw=4 
-*  The MIT License
 *  
 *  Copyright (c) 2016 Eugênio Pacceli Reis da Fonseca  
 *
@@ -29,5 +28,34 @@
 
 #ifndef __SOCKETEXCEPTION_H
 #define __SOCKETEXCEPTION_H
+
+#include <string>
+#include <exception>
+
+using namespace std;
+
+class SocketException: public exception {
+
+public:
+        /*  
+        *       Construct a inherits from exception with explanatory message
+        *       @param message show message erro from exception
+        *       @param inclSysMsg if there is message from strerror(errno) is true
+        */
+        SocketException(const string& message, bool inclSysMsg = false) throw();
+
+        /*  
+        *       
+        */
+        ~SocketException() throw();
+
+        /** 
+        *       @return the exception message in c style
+        */
+        const char* what() const throw();
+
+private:
+        string errorMessage;    // keep exception erro messages
+};
 
 #endif
