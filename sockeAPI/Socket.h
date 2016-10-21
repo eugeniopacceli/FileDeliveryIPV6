@@ -32,7 +32,32 @@
 
 using namespace std;
 
+/*general class representing a socket*/
 class Socket {
+
+public:
+	~Socket();	
+	unsigned short getLocalPort();
+	string getLocalAddress();
+	void bind() throw(SocketException);
+	void bind(unsigned short localPort) throw(SocketException);	
+	void bind(const string& address, unsigned short localPort) throw(SocketException);	
+	void shutdown(int how) throw(SocketException);
+	
+private:
+	Socket(const Socket& socket);
+	void operator=(const Socket& socket);
+
+protected:
+	int sockfd;
+	sockaddr_in addr;
+	Socket(int sockfd);
+	Socket(int domain, int type, int protocol) throw(SocketException);
+
+};
+
+/*class enable to communicate with by send and receive function*/
+class ChannelSocket: public Socket {
 
 public:
 
@@ -40,6 +65,28 @@ private:
 
 protected:
 
-}
+};
+
+/*class socket to TCP protocol*/
+class TCPSocket: public ChannelSocket {
+
+public:
+
+private:
+
+protected:
+
+};
+
+/*class socket to TCP protocol from server side*/
+class TCPServerSocket: Socket {
+
+public:
+
+private:
+
+protected:
+
+};
 
 #endif

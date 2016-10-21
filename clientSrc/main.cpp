@@ -27,6 +27,7 @@
 * @discription:
 */
 
+#include "ClientSocket.h"
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>

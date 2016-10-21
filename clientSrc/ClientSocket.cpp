@@ -26,3 +26,7 @@
 *
 * @discription:
 */
+
+#include "../socketAPI/Socket.h"
+#include "../socketAPI/SocketException.h"
+#include "ClientSocket.h"

@@ -29,5 +29,15 @@
 
 #ifndef __SERVERSOCKET_H
 #define __SERVERSOCKET_H
+#include <iostream>
+#include <fstream>
+
+class FileDeliveryIPV6Server {
+
+public:
+	FileDeliveryIPV6Server();
+
+	~FileDeliveryIPV6Server();
+}
 
 #endif

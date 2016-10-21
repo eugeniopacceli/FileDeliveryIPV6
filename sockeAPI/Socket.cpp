@@ -26,9 +26,8 @@
 *
 * @discription:
 */
-/*
+
 #include "Socket.h"
-*/
 #include "SocketException.h"
 
 #include <sys/types.h>      
@@ -61,6 +60,95 @@ const char* SocketException::what() const throw() {
 /***********************************************************************/
 
 //Socket code
+/***********************************************************************/
+Socket::Socket(int domain, int type, int protocol) 
+	throw(SocketException) {
+	//create a new socket
+	if((sockfd = socket(domain, type, protocol) < 0)) {
+		throw SocketException("socket creation failed (socket())", true);
+	}
+}
+
+Socket::Socket(int sockfd) {
+	//assign the already exist socket descriptor
+	this->sockfd = sockfd;
+}
+
+Socket::~Socket() {
+	::close(sockfd);
+	sockfd = -1;
+}
+
+unsigned short Socket::getLocalPort()
+	throw(SocketException) {
+
+	sockaddr_in addr;
+	unsigned int addr_len = sizeof(addr);
+	if(getsockname(sockfd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) {
+		throw SocketException("Fetching local port failed (getsockname())", true);
+	} 
+	
+	return ntohs(addr.sin_port);	
+}
+
+string Socket::getLocalAddress()
+	throw(SocketException) {
+
+	sockaddr_in addr;
+	unsigned int addr_len = sizeof(addr);
+	if(getsockname(sockfd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) {
+		throw SocketException("Fetching local address failed (getsockname())", true);
+	} 
+	
+	return inet_ntoa(addr.sin_addr);	
+}
+
+void Socket::bind() 
+	throw(SocketException) {
+	
+	sockaddr_in localAddr;
+	memset(&localAddr,'\0' , sizeof(localAddr));
+	localAddr.sin_family = AF_INET;
+	localAddr.sin_port = htons(0);
+	localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	
+
+void Socket::bind(unsigned short localPort)
+	throw(SocketException) {
+	
+	sockaddr_in localAddr;
+	memset(&localAddr,'\0' , sizeof(localAddr));
+	localAddr.sin_family = AF_INET;
+	localAddr.sin_port = htons(localPort);
+	localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+}
+
+void Socket::bind(const string& address , unsigned short localPort)
+	throw(SocketException) {
+}
+
+void Socket::shutdown(int how)
+	throw(SocketException) {
+
+	if(::shutdown(this->sockdf, how) < 0) {
+		throw SocketException("failed to shutdown (shutdown())", true);
+	}
+
+}
+/***********************************************************************/
+
+//ChannelSocket
+/***********************************************************************/
+
+/***********************************************************************/
+
+//TCPSocket
+/***********************************************************************/
+
+/***********************************************************************/
+
+//TCPServer
 /***********************************************************************/
 
 /***********************************************************************/

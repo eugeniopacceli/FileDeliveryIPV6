@@ -29,5 +29,21 @@
 
 #ifndef __CLEINTSOCKET_H
 #define __CLEINTSOCKET_H
+#include <iostream>
+#include <fstream>
+
+using namespace std;
+
+class FileDeliveryIPV6Client {
+
+public:
+	FileDeliveryIPV6Client();
+
+	~FileDeliveryIPV6Client();
+	
+	void operator<<(string command);
+
+	void operator>>(ofstream& file);
+}
 
 #endif
