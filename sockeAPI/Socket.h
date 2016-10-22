@@ -131,18 +131,18 @@ public:
 	*/
 	string getForeignAddress() throw(SocketException);
 
+
+protected:
+
 	/**
-	*protected
+	*
 	*/
 	ChannelSocket(int domain, int type, int protocol) throw(SocketException);
 
 	/**
-	*protected
+	*
 	*/
 	ChannelSocket(int sockfd);
-
-
-protected:
 
 };
 
