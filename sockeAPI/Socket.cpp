@@ -188,7 +188,7 @@ void ChannelSocket::send(const void *buffer, int bufferLen)
 	throw(SocketException) {
 
 	if(::send(sockfd, (void *)buffer, bufferLen, 0) < 0) {
-		throw SocketException("");
+		throw SocketException("Failed in send (send())", true);
 	} 
 }
 
@@ -197,7 +197,7 @@ int ChannelSocket::receive(const void *buffer, int bufferLen)
 	
 	int rcvt;
 	if((rcvt = ::recv(sockfd, (void *)buffer, bufferLen, 0)) < 0) {
-		throw SocketException("");
+		throw SocketException("Failed in receive (recv())", true);
 	} 
 	
 	return rcvt;
@@ -232,9 +232,52 @@ string ChannelSocket::getForeignAddress()
 //TCPSocket
 /***********************************************************************/
 
+TCPSocket::TCPSocket() 
+	throw(SocketException): ChannelSocket(AF_INET, SOCK_STREAM, 0) {
+}
+
+TCPSocket::TCPSocket(int sockfd): ChannelSocket(sockfd) {
+}
+
+TCPSocket::TCPSocket(const string &foreignAddress, unsigned short foreignPort) 
+	throw(SocketException): ChannelSocket(AF_INET, SOCK_STREAM, 0) {
+	connect(foreignAddress, foreignPort);
+}
+
 /***********************************************************************/
 
 //TCPServer
 /***********************************************************************/
 
+TCPServerSocket::TCPServerSocket(unsigned short port, int queue) 
+	throw(SocketException): Socket(AF_INET, SOCK_STREAM, 0) {
+	bind(port);
+	listen(queue);
+}
+
+TCPServerSocket::TCPServerSocket(const string &localAddress, unsigned short port, int queue)
+	throw(SocketException): Socket(AF_INET, SOCK_STREAM, 0) {
+	bind(localAddress, port);
+	listen(queue);
+}
+
+TCPSocket *TCPServerSocket::accept()
+	throw(SocketException) {
+
+	int newsockfd;
+	sockaddr_in addr;
+	int addr_len = sizeof(addr);
+	if((newsockfd = ::accept(sockfd, (sockaddr *) &addr, (socklen_t *) &addr_len)) < 0) {
+		throw SocketException("Failed of accept (accept())", true);
+	}
+	
+	return new TCPSocket(newsockfd);
+}
+
+void TCPServerSocket::listen(int queueLen)
+	throw(SocketException) {
+	if(::listen(sockfd, queueLen) < 0) {
+		throw SocketException("listen in socket failed (listen())", true);
+	}
+}
 /***********************************************************************/

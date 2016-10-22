@@ -146,28 +146,57 @@ protected:
 
 };
 
-#if 0
 /*class socket to TCP protocol*/
 class TCPSocket: public ChannelSocket {
 
 public:
+	
+	/**
+	*
+	*/
+	TCPSocket() throw(SocketException);
+	
+	/**
+	*
+	*/
+	TCPSocket(const string &foreignAddress, unsigned short foreignPort) throw(SocketException);
 
 private:
-
-protected:
-
+	
+	/**
+	*
+	*/
+	friend class TCPServerSocket;
+	TCPSocket(int sockfd);
 };
 
 /*class socket to TCP protocol from server side*/
-class TCPServerSocket: Socket {
+class TCPServerSocket: public Socket {
 
 public:
+	
+	/**
+	*
+	*/
+	TCPServerSocket(unsigned short port, int queueLen = 5)
+		throw(SocketException);
+
+	/**
+	*
+	*/
+	TCPServerSocket(const string &localAddress, unsigned short port, int queueLen = 5)
+		throw(SocketException);
+	/**
+	*
+	*/
+	TCPSocket *accept() throw(SocketException);
 
 private:
 
-protected:
-
+	/**
+	*
+	*/
+	void listen(int queueLen) throw(SocketException);
 };
-#endif
 
 #endif
