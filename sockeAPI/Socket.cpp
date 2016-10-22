@@ -157,7 +157,6 @@ void Socket::bind(const string& address , unsigned short localPort)
 //ChannelSocket
 /***********************************************************************/
 
-#if 0
 ChannelSocket::ChannelSocket(int domain, int type, int protocol)
 	throw(SocketException): Socket(domain, type, protocol) {
 }
@@ -170,7 +169,7 @@ void ChannelSocket::connect(const string &destAddress, unsigned short destPort)
 
 	sockaddr_in foreignAddr;
 	memset(&foreignAddr,'\0' , sizeof(foreignAddr));
-	localAddr.sin_family = AF_INET;
+	foreignAddr.sin_family = AF_INET;
 	hostent *host;
 
 	if((host = gethostbyname(destAddress.c_str())) == NULL) {
@@ -188,13 +187,46 @@ void ChannelSocket::connect(const string &destAddress, unsigned short destPort)
 void ChannelSocket::send(const void *buffer, int bufferLen)
 	throw(SocketException) {
 
+	if(::send(sockfd, (void *)buffer, bufferLen, 0) < 0) {
+		throw SocketException("");
+	} 
 }
 
-void ChannelSocket::receive(const void *buffer, int bufferLen)
+int ChannelSocket::receive(const void *buffer, int bufferLen)
+	throw(SocketException) {
+	
+	int rcvt;
+	if((rcvt = ::recv(sockfd, (void *)buffer, bufferLen, 0)) < 0) {
+		throw SocketException("");
+	} 
+	
+	return rcvt;
+}
+
+unsigned short ChannelSocket::getForeignPort()
 	throw(SocketException) {
 
+	sockaddr_in addr;
+	unsigned int addr_len = sizeof(addr);
+	if(getpeername(sockfd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) {
+		throw SocketException("Fetching foreign port failed (getpeername())", true);
+	} 
+	
+	return ntohs(addr.sin_port);	
 }
-#endif
+
+string ChannelSocket::getForeignAddress()
+	throw(SocketException) {
+
+	sockaddr_in addr;
+	unsigned int addr_len = sizeof(addr);
+	if(getpeername(sockfd, (sockaddr *) &addr, (socklen_t *) &addr_len) < 0) {
+		throw SocketException("Fetching foreign address failed (getpeername())", true);
+	} 
+	
+	return inet_ntoa(addr.sin_addr);	
+}
+
 /***********************************************************************/
 
 //TCPSocket

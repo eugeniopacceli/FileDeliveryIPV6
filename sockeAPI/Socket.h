@@ -101,7 +101,6 @@ protected:
 
 };
 
-#if 0
 /*class enable to communicate with by send and receive function*/
 class ChannelSocket: public Socket {
 
@@ -120,7 +119,7 @@ public:
 	/**
 	*
 	*/
-	void receive(const void *buffer, int bufferLen) throw(SocketException);
+	int receive(const void *buffer, int bufferLen) throw(SocketException);
 
 	/**
 	*
@@ -130,7 +129,7 @@ public:
 	/**
 	*
 	*/
-	string getForeignPort() throw(SocketException);
+	string getForeignAddress() throw(SocketException);
 
 	/**
 	*protected
@@ -147,6 +146,7 @@ protected:
 
 };
 
+#if 0
 /*class socket to TCP protocol*/
 class TCPSocket: public ChannelSocket {
 
