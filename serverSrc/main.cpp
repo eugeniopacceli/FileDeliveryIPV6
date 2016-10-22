@@ -27,11 +27,14 @@
 * @discription:
 */
 
-#include "ServerSocket.h"
+//#include "ServerSocket.h"
 #include <iostream>
 #include <unistd.h>
 #include <stdlib.h>
 #include <cstring>
+//testing
+#include "../socketAPI/SocketException.h"
+#include "../socketAPI/Socket.h"
 
 using namespace std;
 

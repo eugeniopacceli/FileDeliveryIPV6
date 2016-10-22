@@ -114,7 +114,12 @@ public:
 	/**
 	*
 	*/
-	void send(const void *buffer, int bufferLen) throw(SocketException);
+	int send(const void *buffer, int bufferLen) throw(SocketException);
+
+	/**
+	*
+	*/
+	int sendall(const void *buffer, int *bufferLen) throw(SocketException);
 
 	/**
 	*

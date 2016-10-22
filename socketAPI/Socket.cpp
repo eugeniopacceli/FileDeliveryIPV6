@@ -184,12 +184,35 @@ void ChannelSocket::connect(const string &destAddress, unsigned short destPort)
 	}
 }
 
-void ChannelSocket::send(const void *buffer, int bufferLen)
+int ChannelSocket::send(const void *buffer, int bufferLen)
 	throw(SocketException) {
-
-	if(::send(sockfd, (void *)buffer, bufferLen, 0) < 0) {
+	
+	int sndl;
+	if((sndl = ::send(sockfd, (void *)buffer, bufferLen, 0) < 0)) {
 		throw SocketException("Failed in send (send())", true);
 	} 
+
+	return sndl;
+}
+
+int ChannelSocket::sendall(const void *buffer, int *bufferLen)
+	throw(SocketException) {
+	
+	int total = 0;
+	int bytesleft = *bufferLen;
+	int n;
+
+	while(total < *bufferLen) {
+		if((n = ::send(sockfd, (void *)(buffer+total), *bufferLen, 0)) < 0) {
+			throw SocketException("Failed in sendall (send())", true);
+		}
+		total += n;
+		bytesleft -= n;
+	}
+
+	*bufferLen = total;
+
+	return n == -1?-1:0;
 }
 
 int ChannelSocket::receive(const void *buffer, int bufferLen)
