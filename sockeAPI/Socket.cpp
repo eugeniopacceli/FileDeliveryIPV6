@@ -61,10 +61,11 @@ const char* SocketException::what() const throw() {
 
 //Socket code
 /***********************************************************************/
+
 Socket::Socket(int domain, int type, int protocol) 
 	throw(SocketException) {
 	//create a new socket
-	if((sockfd = socket(domain, type, protocol) < 0)) {
+	if(((sockfd = socket(domain, type, protocol)) < 0)) {
 		throw SocketException("socket creation failed (socket())", true);
 	}
 }
@@ -112,7 +113,10 @@ void Socket::bind()
 	localAddr.sin_port = htons(0);
 	localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-	
+	if(::bind(sockfd, (sockaddr *) &localAddr, sizeof(sockaddr)) < 0) {
+		throw SocketException("Set of port failed (bind())", true);
+	}	
+}
 
 void Socket::bind(unsigned short localPort)
 	throw(SocketException) {
@@ -122,25 +126,75 @@ void Socket::bind(unsigned short localPort)
 	localAddr.sin_family = AF_INET;
 	localAddr.sin_port = htons(localPort);
 	localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+	if(::bind(sockfd, (sockaddr *) &localAddr, sizeof(sockaddr)) < 0) {
+		throw SocketException("Set of local port failed (bind())", true);
+	}	
 }
 
 void Socket::bind(const string& address , unsigned short localPort)
 	throw(SocketException) {
-}
 
-void Socket::shutdown(int how)
-	throw(SocketException) {
+	sockaddr_in localAddr;
+	memset(&localAddr,'\0' , sizeof(localAddr));
+	localAddr.sin_family = AF_INET;
+	hostent *host;
 
-	if(::shutdown(this->sockdf, how) < 0) {
-		throw SocketException("failed to shutdown (shutdown())", true);
+	if((host = gethostbyname(address.c_str())) == NULL) {
+		throw SocketException("Failed to resolve name (gethostbyname())");
 	}
 
+	localAddr.sin_port = htons(localPort);
+	localAddr.sin_addr = *((struct in_addr *)host->h_addr_list[0]);
+
+	if(::bind(sockfd, (sockaddr *) &localAddr, sizeof(sockaddr)) < 0) {
+		throw SocketException("Set of local port and address failed (bind())", true);
+	}	
 }
+
 /***********************************************************************/
 
 //ChannelSocket
 /***********************************************************************/
 
+#if 0
+ChannelSocket::ChannelSocket(int domain, int type, int protocol)
+	throw(SocketException): Socket(domain, type, protocol) {
+}
+
+ChannelSocket::ChannelSocket(int sockfd): Socket(sockfd) {
+}
+
+void ChannelSocket::connect(const string &destAddress, unsigned short destPort)
+	throw(SocketException) {
+
+	sockaddr_in foreignAddr;
+	memset(&foreignAddr,'\0' , sizeof(foreignAddr));
+	localAddr.sin_family = AF_INET;
+	hostent *host;
+
+	if((host = gethostbyname(destAddress.c_str())) == NULL) {
+		throw SocketException("Failed to resolve name (gethostbyname())");
+	}
+
+	foreignAddr.sin_port = htons(destPort);
+	foreignAddr.sin_addr = *((struct in_addr *)host->h_addr_list[0]);
+
+	if((::connect(sockfd, (sockaddr *) &foreignAddr, sizeof(foreignAddr))) < 0) {
+		throw SocketException("Failed in trying to connect", true);
+	}
+}
+
+void ChannelSocket::send(const void *buffer, int bufferLen)
+	throw(SocketException) {
+
+}
+
+void ChannelSocket::receive(const void *buffer, int bufferLen)
+	throw(SocketException) {
+
+}
+#endif
 /***********************************************************************/
 
 //TCPSocket

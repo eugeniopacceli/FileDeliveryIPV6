@@ -29,6 +29,8 @@
 
 #ifndef __SOCKET_H
 #define __SOCKET_H
+#include "SocketException.h"
+#include <string>
 
 using namespace std;
 
@@ -36,32 +38,110 @@ using namespace std;
 class Socket {
 
 public:
+	/**
+	*
+	*/
 	~Socket();	
-	unsigned short getLocalPort();
-	string getLocalAddress();
+
+	/**
+	*
+	*/
+	unsigned short getLocalPort() throw(SocketException);
+
+	/**
+	*
+	*/
+	string getLocalAddress() throw(SocketException);
+
+	/**
+	*
+	*/
 	void bind() throw(SocketException);
+
+	/**
+	*
+	*/
 	void bind(unsigned short localPort) throw(SocketException);	
+
+	/**
+	*
+	*/
 	void bind(const string& address, unsigned short localPort) throw(SocketException);	
-	void shutdown(int how) throw(SocketException);
+
+
+	/**
+	*mudar para protected
+	*/
+	Socket(int domain, int type, int protocol) throw(SocketException);
 	
 private:
+
+	/**
+	*
+	*/
 	Socket(const Socket& socket);
+
+	/**
+	*
+	*/
 	void operator=(const Socket& socket);
 
 protected:
+
+	/**
+	*
+	*/
 	int sockfd;
-	sockaddr_in addr;
+
+	/**
+	*
+	*/
 	Socket(int sockfd);
-	Socket(int domain, int type, int protocol) throw(SocketException);
+
 
 };
 
+#if 0
 /*class enable to communicate with by send and receive function*/
 class ChannelSocket: public Socket {
 
 public:
 
-private:
+	/**
+	*
+	*/
+	void connect(const string &destAddress, unsigned short desPort)	throw(SocketException);	
+
+	/**
+	*
+	*/
+	void send(const void *buffer, int bufferLen) throw(SocketException);
+
+	/**
+	*
+	*/
+	void receive(const void *buffer, int bufferLen) throw(SocketException);
+
+	/**
+	*
+	*/
+	unsigned short getForeignPort() throw(SocketException);
+
+	/**
+	*
+	*/
+	string getForeignPort() throw(SocketException);
+
+	/**
+	*protected
+	*/
+	ChannelSocket(int domain, int type, int protocol) throw(SocketException);
+
+	/**
+	*protected
+	*/
+	ChannelSocket(int sockfd);
+
 
 protected:
 
@@ -88,5 +168,6 @@ private:
 protected:
 
 };
+#endif
 
 #endif
