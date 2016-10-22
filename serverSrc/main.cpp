@@ -54,57 +54,75 @@ void showhelpinfo(char *s)
   exit(1);
 }
 
+void HandleTCPClient(TCPSocket *);
+
 int main (int argc,char *argv[])
 {
-  /*set default options*/
-  struct {
-    string port;
-    string buffer;
-    string dir;
-  } options;
-  
-  char opt;
-  int  optflag = 0;
+	/*set default options*/
+	struct {
+		unsigned short	 port;
+		int				 buffer;
+		string 			 dir;
+	} options;
 
-  /*use function getopt to get the arguments with option."hp:b:d:o" indicate 
-  that option h,o are the options without arguments while p,b,d are the
-  options with arguments*/
-  while((opt=getopt(argc,argv,"hp:b:d:o"))!=-1)
-  {
-    switch(opt)
-    {
-      case 'o':
-	optflag = 1;
-	break;
-      case 'h':
-        showhelpinfo(argv[0]);
-        break;
-      case 'p':
-	options.port = optarg;
-        break;
-      case 'b':
-	options.buffer = optarg;
-        break;
-      case 'd':
-	options.dir = optarg;
-      	break;
-      /*invail input will get the heil infomation*/
-      default:
-        showhelpinfo(argv[0]);
-      break;
-    }
-  }
+	char opt;
+	int  optflag = 0;
 
-  if(!optflag) {
-    /*if the program is ran witout options ,it will show the usgage and exit*/
-    if(argc == optind)
-    {
-      showhelpinfo(argv[0]);
-    }
-    for(int i = optind; i < argc ; i++) {
-      cout << argv[i] << endl;
-    }
-  }
+	/*use function getopt to get the arguments with option."hp:b:d:o" indicate 
+	that option h,o are the options without arguments while p,b,d are the
+	options with arguments*/
+	while((opt=getopt(argc,argv,"hp:b:d:o"))!=-1)
+	{
+		switch(opt)
+		{
+			case 'o':
+				optflag = 1;
+				break;
+			case 'h':
+				showhelpinfo(argv[0]);
+				break;
+			case 'p':
+				options.port = (unsigned short)atoi(optarg);
+				break;
+			case 'b':
+				options.buffer = atoi(optarg);
+				break;
+			case 'd':
+				options.dir = optarg;
+				break;
+			/*invail input will get the heil infomation*/
+			default:
+				showhelpinfo(argv[0]);
+		}
+	}
+
+	if(!optflag) {
+	/*if the program is ran witout options ,it will show the usgage and exit*/
+		if(argc == optind)
+		{
+			showhelpinfo(argv[0]);
+		}
+		for(int i = optind; i < argc ; i++) {
+			cout << argv[i] << endl;
+		}
+	}
+	
+	try {
+		TCPServerSocket serverSocket(options.port);
+		for(;;) {
+			HandleTCPClient(serverSocket.accept());
+		}
+	}
+	catch(SocketException &e) {
+		cout << "erro: " << e.what() << endl;
+	}	
   
-  return 0;
+	return 0;
+}
+
+void HandleTCPClient(TCPSocket *newsockfd) {
+
+	cout << newsockfd->getForeignAddress() << endl;
+	cout << newsockfd->getForeignPort() << endl;
+	delete newsockfd;
 }

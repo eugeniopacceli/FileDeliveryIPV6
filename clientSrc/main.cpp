@@ -99,7 +99,6 @@ int main (int argc,char *argv[])
 			/*invail input will get the heil infomation*/
 			default:
 				showhelpinfo(argv[0]);
-				break;
 		}
 	}
 
