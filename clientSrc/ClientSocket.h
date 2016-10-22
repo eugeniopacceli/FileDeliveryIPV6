@@ -32,6 +32,7 @@
 #include <iostream>
 #include <fstream>
 
+#if 0
 using namespace std;
 
 class FileDeliveryIPV6Client {
@@ -45,5 +46,6 @@ public:
 
 	void operator>>(ofstream& file);
 }
+#endif
 
 #endif

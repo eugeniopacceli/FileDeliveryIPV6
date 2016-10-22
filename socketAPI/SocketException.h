@@ -1,4 +1,5 @@
 /* vim: set noet ts=4 sw=4 
+*  The MIT License
 *  
 *  Copyright (c) 2016 Eugênio Pacceli Reis da Fonseca  
 *
