@@ -124,7 +124,12 @@ public:
 	/**
 	*
 	*/
-	int receive(const void *buffer, int bufferLen) throw(SocketException);
+	int recv(const void *buffer, int bufferLen) throw(SocketException);
+
+	/**
+	*
+	*/
+	size_t recvFully(void *buffer, int bufferLen) throw(SocketException);
 
 	/**
 	*

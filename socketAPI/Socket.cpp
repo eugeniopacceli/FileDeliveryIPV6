@@ -215,7 +215,7 @@ int ChannelSocket::sendall(const void *buffer, int *bufferLen)
 	return n == -1?-1:0;
 }
 
-int ChannelSocket::receive(const void *buffer, int bufferLen)
+int ChannelSocket::recv(const void *buffer, int bufferLen)
 	throw(SocketException) {
 	
 	int rcvt;
@@ -225,6 +225,23 @@ int ChannelSocket::receive(const void *buffer, int bufferLen)
 	
 	return rcvt;
 }
+
+size_t ChannelSocket::recvFully(void *buffer, int bufferLen) 
+  throw(SocketException) {
+  int rcount = 0;
+  int len = ::recv(sockfd, (void *)buffer, bufferLen, 0);
+  while (len > 0 && rcount + len < bufferLen) {
+    rcount += len;
+    len = ::recv(sockDesc, (void *) (((char *) buffer) + rcount), 
+                 bufferLen - rcount, 0);
+  }
+
+  if (len < 0)
+    throw SocketException("Receive failed (recv())");
+
+  return rcount + len;
+}
+
 
 unsigned short ChannelSocket::getForeignPort()
 	throw(SocketException) {

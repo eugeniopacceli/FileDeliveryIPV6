@@ -103,7 +103,7 @@ int main (int argc,char *argv[])
 	}
 
   	if(!optflag) {
-    /*if the program is ran without options ,it will show the usgage and exit*/
+    /*if the program is running without options ,it will show the usgage and exit*/
     	if(argc  == optind)
     	{
       		showhelpinfo(argv[0]);
