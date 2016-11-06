@@ -8,6 +8,12 @@
 
 using namespace std;
 
+void signalHandler( int signum ) {
+	cout << "Interrupt signal (" << signum << ") received.\n";
+	delete 
+	exit(signum);
+}
+
 //thread main function
 static void *HandleTCPClient(void *arg);
 
@@ -21,6 +27,8 @@ FileDeliveryIPV6Server* globalServer;
 Options globalOptions;
 
 int main(int argc, char *argv[]) {
+
+	signal( SIGINT, signalHandler);
 
     /*set default options*/
 
@@ -90,16 +98,10 @@ static void *HandleTCPClient(void *arg) {
 	try {
         package = sock->receiveFormatted(buffer,globalOptions.buffer);
         request = string(package.buffer);
-		/*
-        string clientAddr = sock->getForeignAddress();
-        int clientPort = sock->getForeignPort();
-		*/
         if(request == "list"){
-            //globalServer->sendDirectoryFileList(clientAddr,clientPort);
             globalServer->sendDirectoryFileList(sock);
         }else if(request.substr(0,3) == "get"){
             // get FILE_NAME, the first letter of the file is the 4th character.
-            //globalServer->sendFile(request.substr(4,string::npos),clientAddr,clientPort);
             globalServer->sendFile(request.substr(4,string::npos),sock);
         }
 	} catch (exception &e) {
