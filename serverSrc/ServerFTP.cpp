@@ -2,7 +2,7 @@
 #include <fstream>
 #include <pthread.h>
 #include "../socketAPI/TCPServerSocket.hpp"
-#include "../socketAPI/CommunicatingService.h"
+//#include "../socketAPI/CommunicatingService.h"
 #include "../socketAPI/GlobalErrorTable.hpp"
 #include "FileDeliveryIPV6Server.hpp"
 
@@ -90,13 +90,17 @@ static void *HandleTCPClient(void *arg) {
 	try {
         package = sock->receiveFormatted(buffer,globalOptions.buffer);
         request = string(package.buffer);
+		/*
         string clientAddr = sock->getForeignAddress();
         int clientPort = sock->getForeignPort();
+		*/
         if(request == "list"){
-            globalServer->sendDirectoryFileList(clientAddr,clientPort);
+            //globalServer->sendDirectoryFileList(clientAddr,clientPort);
+            globalServer->sendDirectoryFileList(sock);
         }else if(request.substr(0,3) == "get"){
             // get FILE_NAME, the first letter of the file is the 4th character.
-            globalServer->sendFile(request.substr(4,string::npos),clientAddr,clientPort);
+            //globalServer->sendFile(request.substr(4,string::npos),clientAddr,clientPort);
+            globalServer->sendFile(request.substr(4,string::npos),sock);
         }
 	} catch (exception &e) {
 		cerr << GlobalErrorTable::GENERIC_ERROR << " :: " << e.what() << endl;
