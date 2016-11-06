@@ -59,7 +59,7 @@ public:
         }
         while(!ok){
             ok = bufferSize >= dirContent.length() - offset;
-            sendSocket->sendFormatted(dirContent.substr(offset, bufferSize).c_str(), bufferSize - offset, ok);
+            sendSocket->sendFormatted(dirContent.substr(offset, bufferSize).c_str(), ok ? dirContent.length() - offset : bufferSize, ok);
             offset += bufferSize;
         }
         delete sendSocket;
