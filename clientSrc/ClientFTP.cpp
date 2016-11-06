@@ -105,9 +105,9 @@ int main(int argc, char *argv[]) {
 			client << "list";
 			//put the list of files in cout
 			client >> cout;
-		}/* else {
+		} else {
 			client << "get" + options.file;
-		}*/
+		}
 	}
 	catch(SocketException &e) {
 		cerr << e.what() << endl;

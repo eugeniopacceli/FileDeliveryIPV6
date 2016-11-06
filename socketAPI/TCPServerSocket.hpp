@@ -11,7 +11,7 @@ public:
     /**
     *
     */
-    TCPServerSocket(unsigned short port, int queue) 
+    TCPServerSocket(unsigned short port, int queue = 5) 
         throw(SocketException): Socket(AF_INET, SOCK_STREAM, 0) {
         bind(port);
         listen(queue);
@@ -20,7 +20,7 @@ public:
     /**
     *
     */
-    TCPServerSocket(const string &localAddress, unsigned short port, int queue)
+    TCPServerSocket(const string &localAddress, unsigned short port, int queue = 5)
         throw(SocketException): Socket(AF_INET, SOCK_STREAM, 0) {
         bind(localAddress, port);
         listen(queue);
