@@ -68,7 +68,7 @@ public:
 
     //void sendFile(string file,string destiny, unsigned short port){
     void sendFile(string file, ChannelSocket *sendSocket){
-        ifstream* input = new ifstream(file, ios::binary);
+        ifstream* input = new ifstream(OSServices::trimDirString(directoryAddr) + file, ios::binary);
         //TCPSocket* sendSocket = new TCPSocket(destiny,port);
         bool ok = true;
         streamsize bytesRead;
