@@ -10,8 +10,6 @@ using namespace std;
 
 //thread main function
 static void *HandleTCPClient(void *arg);
- 
-FileDeliveryIPV6Server* globalServer;
 
 typedef struct {
         unsigned short   port;
@@ -19,13 +17,15 @@ typedef struct {
         string           dir;
     } Options;
 
+FileDeliveryIPV6Server* globalServer;
+Options globalOptions;
+
 int main(int argc, char *argv[]) {
 
     /*set default options*/
 
     char opt;
     int  optflag = 0;
-    Options options;
     /*use function getopt to get the arguments with option."hp:b:d:o" indicate 
     that option h,o are the options without arguments while p,b,d are the
     options with arguments*/
@@ -38,13 +38,13 @@ int main(int argc, char *argv[]) {
                 GlobalErrorTable::showServerHelpAndExit(argv[0]);
                 break;
             case 'p':
-                options.port = (unsigned short)atoi(optarg);
+                globalOptions.port = (unsigned short)atoi(optarg);
                 break;
             case 'b':
-                options.buffer = atoi(optarg);
+                globalOptions.buffer = atoi(optarg);
                 break;
             case 'd':
-                options.dir = optarg;
+                globalOptions.dir = optarg;
                 break;
             default:
                 GlobalErrorTable::showServerHelpAndExit(argv[0]);
@@ -58,14 +58,14 @@ int main(int argc, char *argv[]) {
 			GlobalErrorTable::showServerHelpAndExit(argv[0]);
 		}
 
-        options.port = (unsigned short)atoi(argv[optind+1]);
-        options.buffer = atoi(argv[optind+2]);
-        options.dir = argv[optind+3];
+        globalOptions.port = (unsigned short)atoi(argv[optind+1]);
+        globalOptions.buffer = atoi(argv[optind+2]);
+        globalOptions.dir = argv[optind+3];
     }
 
    try {
-        TCPServerSocket serverSocket(options.port);
-        globalServer = new FileDeliveryIPV6Server(options.buffer, options.dir);
+        TCPServerSocket serverSocket(globalOptions.port);
+        globalServer = new FileDeliveryIPV6Server(globalOptions.buffer, globalOptions.dir);
         for(;;) {
 			TCPSocket *sock = serverSocket.accept();
 			pthread_t newThread; // Give client in a separate thread
@@ -78,23 +78,30 @@ int main(int argc, char *argv[]) {
         cerr << GlobalErrorTable::SOCKET_ERROR << " :: " << e.what() << endl;
     }
 
+    delete globalServer;
     return 0;
 }
 
 static void *HandleTCPClient(void *arg) {
 	TCPSocket *sock = (TCPSocket *)arg;
+    char* buffer = new char[globalOptions.buffer]();
+    PackageFormat package;
+    string request;
 	try {
-        // RECEIVE REQUEST PACKAGE
-        // PARSE
+        package = sock->receiveFormatted(buffer,globalOptions.buffer);
+        request = string(package.buffer);
         string clientAddr = sock->getForeignAddress();
-        int clientPort = sock->getForeignPort(); 
-        // CHOOSE BETWEEN sendDirectoryFileList(clientAddr,clientPort)
-        // OR             sendFile(fileName,clientAddr,clientPort)
+        int clientPort = sock->getForeignPort();
+        if(request == "list"){
+            globalServer->sendDirectoryFileList(clientAddr,clientPort);
+        }else if(request.substr(0,3) == "get"){
+            // get FILE_NAME, the first letter of the file is the 4th character.
+            globalServer->sendFile(request.substr(4,string::npos),clientAddr,clientPort);
+        }
 	} catch (exception &e) {
 		cerr << GlobalErrorTable::GENERIC_ERROR << " :: " << e.what() << endl;
 	}
+    delete[] buffer;
 	delete sock;
 	return NULL;
-	// Report errors to the console.
-	// Free the socket object (and close the connection)
 }

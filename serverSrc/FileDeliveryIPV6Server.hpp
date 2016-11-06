@@ -76,6 +76,14 @@ public:
         delete[] buffer;
     }
 
+    streamsize getBufferSize(){
+    	return this->bufferSize;
+    }
+
+    string getDirecoryAddr(){
+    	return this->directoryAddr;
+    }
+
     ~FileDeliveryIPV6Server(){
     }
 };
