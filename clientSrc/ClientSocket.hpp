@@ -45,7 +45,7 @@ class FileDeliveryIPV6Client {
 public:
 	FileDeliveryIPV6Client(string server, unsigned short port, int buffersize):
 		socket(server, port), sbuffer(buffersize) {
-		buffer = new char[sbuffer]();
+		buffer = new char[sbuffer + sizeof(size_t) + sizeof(bool)]();
 	}
 
 	~FileDeliveryIPV6Client() {
@@ -76,7 +76,7 @@ public:
 		while(!done) {
 			package = socket.receiveFormatted((void *)buffer, sbuffer + sizeof(bool) + sizeof(size_t));
 			done = package.packageLen < sbuffer || package.packageLen == 0;
-			destiny->write(buffer, !package.isFinal ? sbuffer : package.packageLen);
+			destiny->write(package.buffer, package.packageLen);
 		}
 		destiny->close();
 		delete destiny;
