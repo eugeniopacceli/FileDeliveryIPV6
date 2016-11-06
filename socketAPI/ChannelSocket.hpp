@@ -3,6 +3,12 @@
 
 #include "Socket.hpp"
 
+typedef struct{
+    size_t packageLen;
+    bool isFinal;
+    char* buffer;
+} PackageFormat;
+
 /*class enable to communicate with by send and receive function*/
 class ChannelSocket: public Socket {
 
@@ -95,6 +101,25 @@ public:
         } 
         
         return rcvt;
+    }
+    /**
+    *
+    */
+    PackageFormat receiveFormatted(const void *buffer, int bufferLen) throw(SocketException) {
+        int rcvt;
+        size_t firstOffset = sizeof(size_t);
+        size_t secondOffset = sizeof(bool);
+        size_t bufferSize;
+        bool isFinal;
+        char* receivedBuffer;
+        if((rcvt = ::recv(sockfd, (void *)buffer, bufferLen, 0)) < 0) {
+            throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
+        }
+        bufferSize = *((size_t*)buffer);
+        isFinal = *((bool*)buffer+firstOffset);
+        receivedBuffer = (char*)buffer + firstOffset + secondOffset;
+        
+        return { bufferSize, isFinal, receivedBuffer};
     }
     /**
     *
