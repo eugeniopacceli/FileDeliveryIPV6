@@ -54,7 +54,7 @@ public:
 	
 	void operator<<(string command) {
 		//send commad to server
-		socket.send(command.c_str(), command.length());
+		socket.sendFormatted(command.c_str(), command.length(), true);
 	}
 
 	void operator>>(ostream& file) {
