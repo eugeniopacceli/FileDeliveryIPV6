@@ -71,7 +71,7 @@ int main(int argc, char *argv[]) {
 			pthread_t newThread; // Give client in a separate thread
 			if (pthread_create(&newThread, NULL, HandleTCPClient, sock) != 0) {
 				cerr << GlobalErrorTable::GENERIC_ERROR << endl;
-				delete sock;
+                delete sock;
 			}
         }
     }catch(SocketException &e) {
@@ -106,6 +106,5 @@ static void *HandleTCPClient(void *arg) {
 		cerr << GlobalErrorTable::GENERIC_ERROR << " :: " << e.what() << endl;
 	}
     delete[] buffer;
-	delete sock;
-	return NULL;
+	pthread_exit(0);
 }

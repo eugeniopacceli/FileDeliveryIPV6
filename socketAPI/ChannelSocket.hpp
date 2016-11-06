@@ -84,7 +84,7 @@ public:
         memcpy(totalBuffer + firstOffset + secondOffset, buffer, bufferSize);
         int sndl;
 
-        if((sndl = sendall((void *)totalBuffer, totalSize) < 0)) {
+        if((sndl = send((void *)totalBuffer, totalSize) < 0)) {
             throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
         } 
 
@@ -135,7 +135,7 @@ public:
         bool isFinal;
         char* receivedBuffer;
 
-        if((rcvt = recvFully((void *)buffer, bufferLen)) < 0) {
+        if((rcvt = recv((void *)buffer, bufferLen)) < 0) {
             throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
         }
 
