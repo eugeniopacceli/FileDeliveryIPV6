@@ -33,26 +33,11 @@
 #include <stdlib.h>
 #include <cstring>
 //testing
-#include "../socketAPI/SocketException.h"
-#include "../socketAPI/Socket.h"
+#include "../socketAPI/SocketException.hpp"
+#include "../socketAPI/TCPServerSocket.hpp"
+#include "../socketAPI/GlobalErrorTable.hpp"
 
 using namespace std;
-
-/*funcion that show the help information*/
-void showhelpinfo(char *s)
-{
-  cout<<endl;
-  cout<<"   Usage:   "<<s<<" <port server> <buffer_size> <directory>"<<endl;
-  cout<<"   or	 :   "<<s<<" -o [-option] [argument]"<<endl;
-  cout<<"   option:  "<<"-h  show help information (this message) and exit"<<endl;
-  cout<<"            "<<"-p  port server"<<endl;
-  cout<<"            "<<"-b  buffer size"<<endl;
-  cout<<"            "<<"-d  directory name"<<endl;
-  cout<<"   example: "<<s<<" portserver buffersize dirname"<<endl;
-  cout<<"   or	   : "<<s<<" -o -p portnumber -t buffersize -d dirname"<<endl;
-  cout<<endl;
-  exit(1);
-}
 
 void HandleTCPClient(TCPSocket *);
 
@@ -79,7 +64,7 @@ int main (int argc,char *argv[])
 				optflag = 1;
 				break;
 			case 'h':
-				showhelpinfo(argv[0]);
+				GlobalErrorTable::showServerHelpAndExit(argv[0]);
 				break;
 			case 'p':
 				options.port = (unsigned short)atoi(optarg);
@@ -92,7 +77,7 @@ int main (int argc,char *argv[])
 				break;
 			/*invail input will get the heil infomation*/
 			default:
-				showhelpinfo(argv[0]);
+				GlobalErrorTable::showServerHelpAndExit(argv[0]);
 		}
 	}
 
@@ -100,7 +85,7 @@ int main (int argc,char *argv[])
 	/*if the program is ran witout options ,it will show the usgage and exit*/
 		if(argc == optind)
 		{
-			showhelpinfo(argv[0]);
+			GlobalErrorTable::showServerHelpAndExit(argv[0]);
 		}
 		for(int i = optind; i < argc ; i++) {
 			cout << argv[i] << endl;

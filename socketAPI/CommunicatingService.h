@@ -1,6 +1,6 @@
 #ifndef __COMMUNICATINGSERVICE_H__
 #define __COMMUNICATINGSERVICE_H__
-#include "Socket.h"
+#include "ChannelSocket.hpp"
 #include <string>
 #include <vector>
 

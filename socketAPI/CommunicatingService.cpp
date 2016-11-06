@@ -9,8 +9,7 @@ void sendInt(ChannelSocket *sock, uint32_t val) throw(SocketException) {
 	// Send the value through the socket
 }
 
-void sendString(ChannelSocket *sock, const string &str)
-throw(SocketException) {
+void sendString(ChannelSocket *sock, const string &str) throw(SocketException) {
 	sendInt(sock, str.length());
 	// Send the length of string
 	sock->send(str.c_str(), str.length()); // Send string contents
@@ -47,37 +46,4 @@ string recvString(ChannelSocket *sock) throw(runtime_error) {
 	// Null terminate the received string
 	// Convert to an std::string
 	// Free temporary buffer
-}
-
-//must be implemented
-bool readDir(istream &stream, std::vector<Files> &qList) {
-/*
-	int count = 0;
-
-	stream >> count;
-	// See how many questions there are
-
-	stream.ignore();
-	// Skip past newline
-
-	qList = vector< Question >(count);
-	// Parse each question.
-
-	for (unsigned int q = 0; q < qList.size(); q++ ) {
-		getline(stream, qList[q].qText);
-	// Get the text of the question
-
-	count = 0;
-	stream >> count;
-	stream.ignore();
-	// Read number of responses
-	// Skip past newline
-	// Initialize the response list and populate it.
-	qList[q].rList = vector< string >(count);
-	for (unsigned int r = 0; r < qList[q].rList.size(); r++)
-		getline(stream, qList[q].rList[r]);
-	}
-	return stream;
-	// Return true if stream is still good
-*/
 }

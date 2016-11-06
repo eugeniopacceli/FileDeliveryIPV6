@@ -1,29 +1,11 @@
 #include <iostream>
 #include <iomanip>
-#include "../socketAPI/Socket.h"
-#include "../socketAPI/SocketException.h"
+#include "../socketAPI/TCPSocket.hpp"
+#include "../socketAPI/SocketException.hpp"
 #include "../socketAPI/CommunicatingService.h"
+#include "../socketAPI/GlobalErrorTable.hpp"
 
 using namespace std;
-
-/*funcion that show the help information*/
-void showhelpinfo(char *s) 
-{
-    cerr<<endl;
-    cerr<<"   Usage:   "<<s<<" { list | get <file> } <server> <port> <buffer_size>"<<endl;
-    cerr<<"   or     :   "<<s<<" { list | get <file> } -o [-option] [argument]"<<endl;
-    cerr<<"   option:  "<<"-h  show help information (this message) and exit"<<endl;
-    cerr<<"            "<<"-s  server"<<endl;
-    cerr<<"            "<<"-p  port"<<endl;
-    cerr<<"            "<<"-b  buffer size"<<endl;
-    cerr<<"            "<<"-f  file name"<<endl;
-    cerr<<"   example: "<<s<<" get filename -s server -p portnumber -t buffersize"<<endl;
-    cerr<<"   or       : "<<s<<" get filename server portnumber buffersize"<<endl;
-    cerr<<"   or       : "<<s<<" list -s server -p portnumber -t buffersize"<<endl;
-    cerr<<"   or       : "<<s<<" list server portnumber buffersize"<<endl;
-    cerr<<endl;
-    exit(1);
-}
 
 
 int main(int argc, char *argv[]) {
@@ -51,7 +33,7 @@ int main(int argc, char *argv[]) {
                 optflag = 1;
                 break;
             case 'h':
-                showhelpinfo(argv[0]);
+                GlobalErrorTable::showClientHelpAndExit(argv[0]);
                 break;
             case 's':
                 options.server = optarg;
@@ -67,14 +49,14 @@ int main(int argc, char *argv[]) {
                 break;
             /*invail input will get the heil infomation*/
             default:
-                showhelpinfo(argv[0]);
+                GlobalErrorTable::showClientHelpAndExit(argv[0]);
         }
     }
 
     /*if the program is running without options ,it will show the usgage and exit*/
 	if(argc  == optind)
 	{
-		showhelpinfo(argv[0]);
+		GlobalErrorTable::showClientHelpAndExit(argv[0]);
 	}
 
 	options.command = argv[optind];

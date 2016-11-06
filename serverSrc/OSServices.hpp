@@ -1,8 +1,8 @@
 /* vim: set noet ts=4 sw=4 
 *  The MIT License
 *  
-*  Copyright (c) 2016 Eugênio Pacceli Reis da Fonseca  
-*
+*  Copyright (c) 2016 Eugênio Pacceli Reis da Fonseca 
+*  
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
 *  in the Software without restriction, including without limitation the rights
@@ -27,36 +27,34 @@
 * @discription:
 */
 
-#ifndef __SOCKETEXCEPTION_H
-#define __SOCKETEXCEPTION_H
-
+#ifndef __OSSERVICES_H
+#define __OSSERVICES_H
+#include <cstdio>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
 #include <string>
-#include <exception>
+#include "../socketAPI/GlobalErrorTable.hpp"
 
 using namespace std;
 
-class SocketException: public exception {
+class OSServices {
+private:
 
 public:
-        /*  
-        *       Construct a inherits from exception with explanatory message
-        *       @param message show message erro from exception
-        *       @param inclSysMsg if there is message from strerror(errno) is true
-        */
-        SocketException(const string& message, bool inclSysMsg = false) throw();
-
-        /*  
-        *       
-        */
-        ~SocketException() throw();
-
-        /** 
-        *       @return the exception message in c style
-        */
-        const char* what() const throw();
-
-private:
-        string errorMessage;    // keep exception erro messages
+	static string getDirectoryFilesList(string directory) {
+	    char buffer[4096];
+	    string dirProcess = "dir -A -l -h " + directory;
+	    string result = "";
+	    FILE* pipe = popen(dirProcess.c_str(), "r");
+	    if (!pipe) throw std::runtime_error(GlobalErrorTable::GENERIC_ERROR);
+	    while (!feof(pipe)) {
+	        if (fgets(buffer, 4096, pipe) != NULL)
+	            result += buffer;
+	    }
+	    pclose(pipe);
+	    return result;
+	}
 };
 
 #endif

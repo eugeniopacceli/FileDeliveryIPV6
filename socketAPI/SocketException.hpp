@@ -1,8 +1,8 @@
 /* vim: set noet ts=4 sw=4 
 *  The MIT License
 *  
-*  Copyright (c) 2016 Eugênio Pacceli Reis da Fonseca 
-*  
+*  Copyright (c) 2016 Eugênio Pacceli Reis da Fonseca  
+*
 *  Permission is hereby granted, free of charge, to any person obtaining a copy
 *  of this software and associated documentation files (the "Software"), to deal
 *  in the Software without restriction, including without limitation the rights
@@ -27,6 +27,50 @@
 * @discription:
 */
 
-#include "../socketAPI/Socket.h"
-#include "../socketAPI/SocketException.h"
-#include "ClientSocket.h"
+#ifndef __SOCKETEXCEPTION_H
+#define __SOCKETEXCEPTION_H
+
+#include <string>
+#include <exception>
+#include <errno.h>
+#include <cstring>
+
+using namespace std;
+
+class SocketException: public exception {
+public:
+
+    SocketException(const string& message) throw(): errorMessage(message) {
+    }
+
+    /*  
+    *       Construct a inherits from exception with explanatory message
+    *       @param message show message erro from exception
+    *       @param inclSysMsg if there is message from strerror(errno) is true
+    */
+    SocketException(const string& message, bool inclSysMsg) 
+        throw(): errorMessage(message) {
+        if(inclSysMsg) {
+            errorMessage.append(": ");
+            errorMessage.append(strerror(errno));
+        }
+    }
+
+
+    /*  
+    *       
+    */
+    ~SocketException() throw() {}
+
+    /** 
+    *       @return the exception message in c style
+    */
+    const char* what() const throw() {
+        return errorMessage.c_str(); 
+    }
+
+private:
+        string errorMessage;    // keep exception erro messages
+};
+
+#endif

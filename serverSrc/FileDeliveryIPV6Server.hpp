@@ -27,25 +27,57 @@
 * @discription:
 */
 
-#ifndef __CLEINTSOCKET_H
-#define __CLEINTSOCKET_H
+#ifndef __SERVERSOCKET_H
+#define __SERVERSOCKET_H
 #include <iostream>
 #include <fstream>
+#include "../socketAPI/TCPServerSocket.hpp"
+#include "../socketAPI/SocketException.hpp"
+#include "OSServices.hpp"
 
-#if 0
-using namespace std;
-
-class FileDeliveryIPV6Client {
+class FileDeliveryIPV6Server {
+private:
+    streamsize bufferSize;
+    char* buffer;
+    string directoryAddr;
+    int port;
 
 public:
-	FileDeliveryIPV6Client();
+    FileDeliveryIPV6Server(streamsize bufferSize, string directoryAddr, int port){
+        this->bufferSize = bufferSize;
+        this->buffer = new char[bufferSize]();
+        this->directoryAddr = directoryAddr;
+        this->port = port;
+    }
 
-	~FileDeliveryIPV6Client();
-	
-	void operator<<(string command);
+    void sendDirectoryFileList(){
+        string dirContent;
+        try{
+            dirContent = OSServices::getDirectoryFilesList(directoryAddr);
+        }catch(exception& e){
+            dirContent = e.what();
+        }
+    }
 
-	void operator>>(ofstream& file);
-}
-#endif
+    void sendFile(string file){
+        ifstream* input = new ifstream(file, ios::binary);
+        bool ok = true;
+        streamsize bytesRead;
+        while(ok){
+            input->read(buffer,bufferSize);
+            ok = !input->eof();
+            bytesRead = input->gcount();
+            //package->write(bytesRead);
+            //package->write(buffer);
+            //send(package);
+        }
+        input->close();
+        delete input;
+    }
+
+    ~FileDeliveryIPV6Server(){
+        delete buffer;
+    }
+};
 
 #endif
