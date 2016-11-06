@@ -1,12 +1,13 @@
-#include <iostream>
 #include <iomanip>
-#include "../socketAPI/TCPSocket.hpp"
-#include "../socketAPI/SocketException.hpp"
-#include "../socketAPI/CommunicatingService.h"
+#include <iostream>
+#include <unistd.h>
+#include <stdlib.h>
+#include <cstring>
+
 #include "../socketAPI/GlobalErrorTable.hpp"
+#include "ClientSocket.hpp"
 
 using namespace std;
-
 
 int main(int argc, char *argv[]) {
 
@@ -60,38 +61,57 @@ int main(int argc, char *argv[]) {
 	}
 
 	options.command = argv[optind];
+	int idx = 1;
+
+	if(!options.command.compare("get")) {
+		options.file = argv[optind+1];
+		idx = 2;
+	} else {
+		//checking if command is valid, if different from list exit
+		if(options.command.compare("list")) {
+			cerr << "error in command passed" << endl;
+			GlobalErrorTable::showClientHelpAndExit(argv[0]);
+		}
+	}		
 
     if(!optflag) {
+		if((argc-optind) < 4 || (argc-optind) > 5) {	 
+			cerr << "wrong number of command passed" << endl;
+			GlobalErrorTable::showClientHelpAndExit(argv[0]);
+		}
 
-		options.server = argv[optind+1];
-		options.port = (unsigned short)atoi(argv[optind+2]);
-		options.buffer = atoi(argv[optind+3]);
-		options.file = argv[optind+4];
+		options.server = argv[optind+idx];
+		idx++;
+		options.port = (unsigned short)atoi(argv[optind+idx]);
+		idx++;
+		options.buffer = atoi(argv[optind+idx]);
     }
 
+#if 0
+	//testing input
+	cout << options.command << endl;
+	cout << options.file << endl;
+	cout << options.server << endl;
+	cout << options.port << endl;
+	cout << options.buffer << endl;
+#endif
 
 	try {
 		// Connect to the server.
-		TCPSocket socket(options.server, options.port);
-/*
-		int qCount = recvInt(&sock);
+		FileDeliveryIPV6Client client(options.server, options.port, options.buffer);
 
-		for (int q = 0; q < qCount; q++) {
-			cout << "Q" << q << ": " << recvString(&sock) << endl;
-
-			int rCount = recvInt(&sock);
-
-			for (int r = 0; r < rCount; r++)
-				cout << setw(2) << r << " " << recvString(&sock) << endl;
-
-			// Send the server the user's response
-			sendInt(&sock, response);
-		}
-	} catch(runtime_error &e) {
+		if(!options.command.compare("list")) {
+			//send commad list to server
+			client << "list";
+			//put the list of files in cout
+			client >> cout;
+		}/* else {
+			client << "get" + options.file;
+		}*/
+	}
+	catch(SocketException &e) {
 		cerr << e.what() << endl;
-	return 1;
-}
-	// Report errors to the console.
-*/
+	}
+
 	return 0;
 }

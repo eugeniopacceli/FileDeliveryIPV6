@@ -31,19 +31,43 @@
 #define __CLEINTSOCKET_H
 #include <iostream>
 #include <fstream>
+#include <iomanip>
+#include "../socketAPI/TCPSocket.hpp"
+#include "../socketAPI/SocketException.hpp"
+//#include "../socketAPI/CommunicatingService.h"
+#include "../socketAPI/GlobalErrorTable.hpp"
+
 
 using namespace std;
 
 class FileDeliveryIPV6Client {
 
+private:
+	TCPSocket socket;
+	char *buffer;
+    int sbuffer;
+
 public:
-	FileDeliveryIPV6Client();
+	FileDeliveryIPV6Client(string server, unsigned short port, int buffersize):
+		socket(server, port), sbuffer(buffersize) {
+		buffer = new char[sbuffer];
+	}
 
-	~FileDeliveryIPV6Client();
+	~FileDeliveryIPV6Client() {
+		delete [] buffer;
+	}
 	
-	void operator<<(string command);
+	void operator<<(string command) {
+		//send commad to server
+		socket.send(command.c_str(), command.length());
+	}
 
-	void operator>>(ofstream& file);
+	void operator>>(ostream& file) {
+		//output command from server
+		socket.recv(buffer, sbuffer); 
+		file << buffer;
+	}
+
 };
 
 #endif

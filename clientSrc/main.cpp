@@ -81,15 +81,21 @@ int main (int argc,char *argv[]){
         }
     }
 
-    if(!optflag) {
     /*if the program is running without options ,it will show the usgage and exit*/
-        if(argc  == optind){
-            GlobalErrorTable::showClientHelpAndExit(argv[0]);
-        }
-        for(int i = optind; i < argc ; i++) {
-            cout << argv[i] << endl;
-        }
-    }
+    if(argc  == optind)
+    {   
+        GlobalErrorTable::showClientHelpAndExit(argv[0]);
+    }   
+
+    options.command = argv[optind];
+
+    if(!optflag) {
+
+        options.server = argv[optind+1];
+        options.port = (unsigned short)atoi(argv[optind+2]);
+        options.buffer = atoi(argv[optind+3]);
+        options.file = argv[optind+4];
+    } 
 
     try {
         TCPSocket socket(options.server, options.port);

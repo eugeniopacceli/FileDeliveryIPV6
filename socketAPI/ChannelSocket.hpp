@@ -51,7 +51,7 @@ public:
         int n;
 
         while(total < *bufferLen) {
-            if((n = ::send(sockfd, (void *)(buffer+total), *bufferLen, 0)) < 0) {
+            if((n = ::send(sockfd, (void *) (((char *) buffer) + total), *bufferLen, 0)) < 0) {
                 throw SocketException("Failed in sendall (send())", true);
             }
             total += n;
@@ -84,7 +84,7 @@ public:
 	    int len = ::recv(sockfd, (void *)buffer, bufferLen, 0);
         while (len > 0 && rcount + len < bufferLen) {
 	        rcount += len;
-	        len = ::recv(sockDesc, (void *) (((char *) buffer) + rcount), 
+	        len = ::recv(sockfd, (void *) (((char *) buffer) + rcount), 
 	                     bufferLen - rcount, 0);
 	    }
 
