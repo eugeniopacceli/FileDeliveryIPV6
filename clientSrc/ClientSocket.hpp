@@ -63,7 +63,7 @@ public:
 
 		while(!done) {
 			package = socket.receiveFormatted((void *)buffer, sbuffer + sizeof(bool) + sizeof(size_t));
-			done = !package.isFinal;
+			done = package.packageLen < sbuffer || package.packageLen == 0;
 			cout << string(package.buffer);
 		}
 	}
@@ -75,7 +75,7 @@ public:
 
 		while(!done) {
 			package = socket.receiveFormatted((void *)buffer, sbuffer + sizeof(bool) + sizeof(size_t));
-			done = !package.isFinal;
+			done = package.packageLen < sbuffer || package.packageLen == 0;
 			destiny->write(buffer, !package.isFinal ? sbuffer : package.packageLen);
 		}
 		destiny->close();

@@ -62,6 +62,7 @@ public:
             sendSocket->sendFormatted(dirContent.substr(offset, bufferSize).c_str(), ok ? dirContent.length() - offset : bufferSize, ok);
             offset += bufferSize;
         }
+        sendSocket->sendFormatted("\0", 0 , ok);
         delete sendSocket;
     }
 
@@ -78,6 +79,7 @@ public:
             bytesRead = input->gcount();
             sendSocket->sendFormatted(buffer, (size_t)bytesRead, ok);
         }
+        sendSocket->sendFormatted("\0", 0 , ok);
         input->close();
         delete input;
         delete sendSocket;
