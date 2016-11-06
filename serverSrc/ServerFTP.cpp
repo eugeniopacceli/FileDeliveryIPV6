@@ -7,16 +7,9 @@
 
 using namespace std;
 
-static vector<Files> qList;
-static pthread_mutex_t lock;
-
-void HandleTCPClient(TCPSocket *newsockfd) {
-
-    cout << newsockfd->getForeignAddress() << endl;
-    cout << newsockfd->getForeignPort() << endl;
-    delete newsockfd;
-}
-
+//thread main function
+static void *HandleTCPClient(void *arg);
+ 
 int main(int argc, char *argv[]) {
 
     /*set default options*/
@@ -69,11 +62,33 @@ int main(int argc, char *argv[]) {
    try {
         TCPServerSocket serverSocket(options.port);
         for(;;) {
-            HandleTCPClient(serverSocket.accept());
+			TCPSocket *sock = servSock.accept();
+			pthread_t newThread; // Give client in a separate thread
+			if (pthread_create(&newThread, NULL, HandleTCPClient, sock) != 0) {
+				cerr << "Can't create new thread" << endl;
+				delete sock;
+			}
         }
     }catch(SocketException &e) {
         cout << "Error: " << e.what() << endl;
     }
 
     return 0;
+}
+
+static void *HandleTCPClient(void *arg) {
+	TCPSocket *sock = (TCPSocket *)arg;
+	// Argument is really a socket
+	try {
+		//
+		//put the server to send and receive from client
+		//
+		//
+	} catch (Exception &e) {
+		cerr << e.what() << endl;
+	}
+	delete sock;
+	return NULL;
+	// Report errors to the console.
+	// Free the socket object (and close the connection)
 }
