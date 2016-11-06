@@ -50,12 +50,18 @@ public:
     void sendDirectoryFileList(ChannelSocket *sendSocket){
         //TCPSocket* sendSocket = new TCPSocket(destiny,port);
         string dirContent;
+        bool ok = false;
+        int offset = 0;
         try{
             dirContent = OSServices::getDirectoryFilesList(directoryAddr);
         }catch(exception& e){
             dirContent = e.what();
         }
-        sendSocket->sendFormatted(dirContent.c_str(), dirContent.length(), true);
+        while(!ok){
+            ok = bufferSize >= dirContent.length() - offset;
+            sendSocket->sendFormatted(dirContent.substr(offset, bufferSize).c_str(), bufferSize - offset, ok);
+            offset += bufferSize;
+        }
         delete sendSocket;
     }
 
