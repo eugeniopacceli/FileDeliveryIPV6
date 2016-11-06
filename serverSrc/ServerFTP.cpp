@@ -26,6 +26,7 @@ int main(int argc, char *argv[]) {
 
     char opt;
     int  optflag = 0;
+
     /*use function getopt to get the arguments with option."hp:b:d:o" indicate 
     that option h,o are the options without arguments while p,b,d are the
     options with arguments*/
@@ -51,16 +52,15 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
     if(!optflag) {
 		/*if the program is running without options ,it will show the usgage and exit*/
 		if(argc  == optind){
 			GlobalErrorTable::showServerHelpAndExit(argv[0]);
 		}
 
-        globalOptions.port = (unsigned short)atoi(argv[optind+1]);
-        globalOptions.buffer = atoi(argv[optind+2]);
-        globalOptions.dir = argv[optind+3];
+        globalOptions.port = (unsigned short)atoi(argv[optind]);
+        globalOptions.buffer = atoi(argv[optind+1]);
+        globalOptions.dir = argv[optind+2];
     }
 
    try {
