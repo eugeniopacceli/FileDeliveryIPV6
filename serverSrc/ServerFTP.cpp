@@ -4,24 +4,28 @@
 #include "../socketAPI/TCPServerSocket.hpp"
 #include "../socketAPI/CommunicatingService.h"
 #include "../socketAPI/GlobalErrorTable.hpp"
+#include "FileDeliveryIPV6Server.hpp"
 
 using namespace std;
 
 //thread main function
 static void *HandleTCPClient(void *arg);
  
-int main(int argc, char *argv[]) {
+FileDeliveryIPV6Server* globalServer;
 
-    /*set default options*/
-    struct {
+typedef struct {
         unsigned short   port;
         int              buffer;
         string           dir;
-    } options;
+    } Options;
+
+int main(int argc, char *argv[]) {
+
+    /*set default options*/
 
     char opt;
     int  optflag = 0;
-
+    Options options;
     /*use function getopt to get the arguments with option."hp:b:d:o" indicate 
     that option h,o are the options without arguments while p,b,d are the
     options with arguments*/
@@ -61,16 +65,17 @@ int main(int argc, char *argv[]) {
 
    try {
         TCPServerSocket serverSocket(options.port);
+        globalServer = new FileDeliveryIPV6Server(options.buffer, options.dir);
         for(;;) {
-			TCPSocket *sock = servSock.accept();
+			TCPSocket *sock = serverSocket.accept();
 			pthread_t newThread; // Give client in a separate thread
 			if (pthread_create(&newThread, NULL, HandleTCPClient, sock) != 0) {
-				cerr << "Can't create new thread" << endl;
+				cerr << GlobalErrorTable::GENERIC_ERROR << endl;
 				delete sock;
 			}
         }
     }catch(SocketException &e) {
-        cout << "Error: " << e.what() << endl;
+        cerr << GlobalErrorTable::SOCKET_ERROR << " :: " << e.what() << endl;
     }
 
     return 0;
@@ -78,14 +83,15 @@ int main(int argc, char *argv[]) {
 
 static void *HandleTCPClient(void *arg) {
 	TCPSocket *sock = (TCPSocket *)arg;
-	// Argument is really a socket
 	try {
-		//
-		//put the server to send and receive from client
-		//
-		//
-	} catch (Exception &e) {
-		cerr << e.what() << endl;
+        // RECEIVE REQUEST PACKAGE
+        // PARSE
+        string clientAddr = sock->getForeignAddress();
+        int clientPort = sock->getForeignPort(); 
+        // CHOOSE BETWEEN sendDirectoryFileList(clientAddr,clientPort)
+        // OR             sendFile(fileName,clientAddr,clientPort)
+	} catch (exception &e) {
+		cerr << GlobalErrorTable::GENERIC_ERROR << " :: " << e.what() << endl;
 	}
 	delete sock;
 	return NULL;
