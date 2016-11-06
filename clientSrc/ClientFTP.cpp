@@ -57,6 +57,7 @@ int main(int argc, char *argv[]) {
     /*if the program is running without options ,it will show the usgage and exit*/
 	if(argc  == optind)
 	{
+		cerr << "missing commands" << endl;
 		GlobalErrorTable::showClientHelpAndExit(argv[0]);
 	}
 
@@ -64,6 +65,11 @@ int main(int argc, char *argv[]) {
 	int idx = 1;
 
 	if(!options.command.compare("get")) {
+		if((optflag && (argc-optind < 2)) || (!optflag && (argc-optind < 5)))
+		{
+			cerr << "missing filename" << endl;
+			GlobalErrorTable::showClientHelpAndExit(argv[0]);
+		}
 		options.file = argv[optind+1];
 		idx = 2;
 	} else {
@@ -106,7 +112,7 @@ int main(int argc, char *argv[]) {
 			//put the list of files in cout
 			client >> cout;
 		} else {
-			client << "get" + options.file;
+			client << "get " + options.file;
 		}
 	}
 	catch(SocketException &e) {
