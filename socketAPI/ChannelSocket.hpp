@@ -53,8 +53,8 @@ public:
         char* totalBuffer = new char[totalSize]();
         
         memcpy(totalBuffer, &bufferSize, firstOffset);
-        memcpy(totalBuffer + firstOffset, &isFinal, sizeof(secondOffset));
-        memcpy(totalBuffer + firstOffset + secondOffset, buffer, sizeof(bufferSize));
+        memcpy(totalBuffer + firstOffset, &isFinal, secondOffset);
+        memcpy(totalBuffer + firstOffset + secondOffset, buffer, bufferSize);
         int sndl;
         if((sndl = ::send(sockfd, (void *)totalBuffer, totalSize, 0) < 0)) {
             throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
