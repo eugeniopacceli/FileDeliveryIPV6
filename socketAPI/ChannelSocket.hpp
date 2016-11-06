@@ -47,6 +47,27 @@ public:
 
         return sndl;
     }
+
+    /**
+    *
+    */
+    int sendall(const void *buffer, int bufferLen) throw(SocketException) {
+        
+        int total = 0;
+        int bytesleft = bufferLen;
+        int n;
+
+        while(total < bufferLen) {
+            if((n = ::send(sockfd, (void *) (((char *) buffer) + total), bytesleft, 0)) < 0) {
+                break;
+            }
+            total += n;
+            bytesleft -= n;
+        }
+
+        return n == -1?-1:total;
+    }
+
     /**
     *
     */
@@ -62,33 +83,14 @@ public:
         memcpy(totalBuffer + firstOffset, &isFinal, secondOffset);
         memcpy(totalBuffer + firstOffset + secondOffset, buffer, bufferSize);
         int sndl;
-        if((sndl = ::send(sockfd, (void *)totalBuffer, totalSize, 0) < 0)) {
+
+        if((sndl = sendall((void *)totalBuffer, totalSize) < 0)) {
             throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
         } 
 
         return sndl;
     }
-    /**
-    *
-    */
-    int sendall(const void *buffer, int *bufferLen) throw(SocketException) {
-        
-        int total = 0;
-        int bytesleft = *bufferLen;
-        int n;
 
-        while(total < *bufferLen) {
-            if((n = ::send(sockfd, (void *) (((char *) buffer) + total), *bufferLen, 0)) < 0) {
-                throw SocketException("Failed in sendall (send())", true);
-            }
-            total += n;
-            bytesleft -= n;
-        }
-
-        *bufferLen = total;
-
-        return n == -1?-1:0;
-    }
     /**
     *
     */
@@ -102,25 +104,7 @@ public:
         
         return rcvt;
     }
-    /**
-    *
-    */
-    PackageFormat receiveFormatted(const void *buffer, int bufferLen) throw(SocketException) {
-        int rcvt;
-        size_t firstOffset = sizeof(size_t);
-        size_t secondOffset = sizeof(bool);
-        size_t bufferSize;
-        bool isFinal;
-        char* receivedBuffer;
-        if((rcvt = ::recv(sockfd, (void *)buffer, bufferLen, 0)) < 0) {
-            throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
-        }
-        bufferSize = *((size_t*)buffer);
-        isFinal = *((bool*)buffer+firstOffset);
-        receivedBuffer = (char*)buffer + firstOffset + secondOffset;
-        
-        return { bufferSize, isFinal, receivedBuffer};
-    }
+
     /**
     *
     */
@@ -139,6 +123,29 @@ public:
 
 	    return rcount + len;
     }
+
+    /**
+    *
+    */
+    PackageFormat receiveFormatted(const void *buffer, int bufferLen) throw(SocketException) {
+        int rcvt;
+        size_t firstOffset = sizeof(size_t);
+        size_t secondOffset = sizeof(bool);
+        size_t bufferSize;
+        bool isFinal;
+        char* receivedBuffer;
+
+        if((rcvt = ::recvFully((void *)buffer, bufferLen)) < 0) {
+            throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
+        }
+
+        bufferSize = *((size_t*)buffer);
+        isFinal = *((bool*)buffer+firstOffset);
+        receivedBuffer = (char*)buffer + firstOffset + secondOffset;
+        
+        return { bufferSize, isFinal, receivedBuffer};
+    }
+
     /**
     *
     */
@@ -153,6 +160,7 @@ public:
         
         return ntohs(addr.sin_port);    
     }
+
     /**
     *
     */

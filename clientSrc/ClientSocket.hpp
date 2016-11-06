@@ -34,8 +34,8 @@
 #include <iomanip>
 #include "../socketAPI/TCPSocket.hpp"
 #include "../socketAPI/SocketException.hpp"
-//#include "../socketAPI/CommunicatingService.h"
 #include "../socketAPI/GlobalErrorTable.hpp"
+//#include "../socketAPI/CommunicatingService.h"
 
 
 using namespace std;
@@ -59,8 +59,15 @@ public:
 
 	void operator>>(ostream& file) {
 		//output command from server
-		socket.recv(buffer, sbuffer); 
-		file << buffer;
+		int rcount = 0;
+		int len;
+
+		PackageFormat package = ::recvFormatted((void *)buffer, bufferLen); 
+		while(!package.isFinal) {
+			package = ::recvFormatted((void *)buffer, bufferLen);
+			file << buffer;
+		}
+
 	}
 
 private:
