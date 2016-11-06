@@ -135,7 +135,7 @@ public:
         bool isFinal;
         char* receivedBuffer;
 
-        if((rcvt = ::recvFully((void *)buffer, bufferLen)) < 0) {
+        if((rcvt = recvFully((void *)buffer, bufferLen)) < 0) {
             throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
         }
 

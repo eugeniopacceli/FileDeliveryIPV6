@@ -57,17 +57,29 @@ public:
 		socket.sendFormatted(command.c_str(), command.length(), true);
 	}
 
-	void operator>>(ostream& file) {
-		//output command from server
-		int rcount = 0;
-		int len;
+	void listDir() {
+		bool done = false;
+		PackageFormat package;
 
-		PackageFormat package = ::recvFormatted((void *)buffer, bufferLen); 
-		while(!package.isFinal) {
-			package = ::recvFormatted((void *)buffer, bufferLen);
-			file << buffer;
+		while(!done) {
+			package = socket.receiveFormatted((void *)buffer, sbuffer + sizeof(bool) + sizeof(size_t));
+			done = !package.isFinal;
+			cout << string(package.buffer);
 		}
+	}
 
+	void writeFile(string fileName) {
+		ofstream* destiny = new ofstream(fileName,ios::binary | ios::trunc);
+		bool done = false;
+		PackageFormat package;
+
+		while(!done) {
+			package = socket.receiveFormatted((void *)buffer, sbuffer + sizeof(bool) + sizeof(size_t));
+			done = !package.isFinal;
+			destiny->write(buffer, !package.isFinal ? sbuffer : package.packageLen);
+		}
+		destiny->close();
+		delete destiny;
 	}
 
 private:

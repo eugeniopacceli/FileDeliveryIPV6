@@ -108,10 +108,10 @@ int main(int argc, char *argv[]) {
 		if(!options.command.compare("list")) {
 			//send commad list to server
 			client << "list";
-			//put the list of files in cout
-			client >> cout;
+			client.listDir();
 		} else {
 			client << "get " + options.file;
+			client.writeFile(options.file);
 		}
 
 	}
