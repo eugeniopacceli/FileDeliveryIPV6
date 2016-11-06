@@ -38,45 +38,45 @@
 class FileDeliveryIPV6Server {
 private:
     streamsize bufferSize;
-    char* buffer;
     string directoryAddr;
-    int port;
 
 public:
-    FileDeliveryIPV6Server(streamsize bufferSize, string directoryAddr, int port){
+    FileDeliveryIPV6Server(streamsize bufferSize, string directoryAddr){
         this->bufferSize = bufferSize;
-        this->buffer = new char[bufferSize]();
         this->directoryAddr = directoryAddr;
-        this->port = port;
     }
 
-    void sendDirectoryFileList(){
+    void sendDirectoryFileList(string destiny, unsigned short port){
+        TCPSocket* sendSocket = new TCPSocket(destiny,port);
         string dirContent;
         try{
             dirContent = OSServices::getDirectoryFilesList(directoryAddr);
         }catch(exception& e){
             dirContent = e.what();
         }
+        sendSocket->sendFormatted(dirContent.c_str(), dirContent.length(), true);
+        delete sendSocket;
     }
 
-    void sendFile(string file){
+    void sendFile(string file,string destiny, unsigned short port){
         ifstream* input = new ifstream(file, ios::binary);
+        TCPSocket* sendSocket = new TCPSocket(destiny,port);
         bool ok = true;
         streamsize bytesRead;
+        char* buffer = new char[bufferSize]();
         while(ok){
             input->read(buffer,bufferSize);
             ok = !input->eof();
             bytesRead = input->gcount();
-            //package->write(bytesRead);
-            //package->write(buffer);
-            //send(package);
+            sendSocket->sendFormatted(buffer, (size_t)bytesRead, ok);
         }
         input->close();
         delete input;
+        delete sendSocket;
+        delete[] buffer;
     }
 
     ~FileDeliveryIPV6Server(){
-        delete buffer;
     }
 };
 

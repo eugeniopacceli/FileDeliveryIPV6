@@ -44,6 +44,27 @@ public:
     /**
     *
     */
+    int sendFormatted(const void *buffer, int bufferLen, bool isFinal) throw(SocketException) {
+        size_t firstOffset = sizeof(size_t);
+        size_t secondOffset = sizeof(bool);
+        size_t bufferSize = bufferLen;
+        size_t totalSize = bufferSize + firstOffset + secondOffset;
+
+        char* totalBuffer = new char[totalSize]();
+        
+        memcpy(totalBuffer, &bufferSize, firstOffset);
+        memcpy(totalBuffer + firstOffset, &isFinal, sizeof(secondOffset));
+        memcpy(totalBuffer + firstOffset + secondOffset, buffer, sizeof(bufferSize));
+        int sndl;
+        if((sndl = ::send(sockfd, (void *)totalBuffer, totalSize, 0) < 0)) {
+            throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
+        } 
+
+        return sndl;
+    }
+    /**
+    *
+    */
     int sendall(const void *buffer, int *bufferLen) throw(SocketException) {
         
         int total = 0;

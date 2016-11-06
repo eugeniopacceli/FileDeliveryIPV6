@@ -31,6 +31,7 @@
 #define __SOCKET_H
 
 #include "SocketException.hpp"
+#include "GlobalErrorTable.hpp"
 #include <string>
 #include <sys/types.h>      
 #include <sys/socket.h>     
