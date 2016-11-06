@@ -42,15 +42,10 @@ using namespace std;
 
 class FileDeliveryIPV6Client {
 
-private:
-	TCPSocket socket;
-	char *buffer;
-    int sbuffer;
-
 public:
 	FileDeliveryIPV6Client(string server, unsigned short port, int buffersize):
 		socket(server, port), sbuffer(buffersize) {
-		buffer = new char[sbuffer];
+		buffer = new char[sbuffer]();
 	}
 
 	~FileDeliveryIPV6Client() {
@@ -68,6 +63,10 @@ public:
 		file << buffer;
 	}
 
+private:
+	TCPSocket socket;
+	char *buffer;
+    int sbuffer;
 };
 
 #endif

@@ -3,7 +3,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <cstring>
-
 #include "../socketAPI/GlobalErrorTable.hpp"
 #include "ClientSocket.hpp"
 
@@ -114,6 +113,7 @@ int main(int argc, char *argv[]) {
 		} else {
 			client << "get " + options.file;
 		}
+
 	}
 	catch(SocketException &e) {
 		cerr << e.what() << endl;
