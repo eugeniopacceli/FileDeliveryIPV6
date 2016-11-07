@@ -132,14 +132,13 @@ void HandleTCPClient(TCPSocket *sock) {
   cout << "Handling client ";
   cout << " with thread " << pthread_self() << endl;
 
-  char* buffer = new char[globalOptions.buffer]();
+  char* safeBuffer = new char[1024]();
   int recvMsgSize;
   string request;
   try {
-      recvMsgSize = sock->recv(buffer, globalOptions.buffer);
-      cout << buffer << endl;
+      recvMsgSize = sock->recv(safeBuffer, 1024);
 
-      request = string(buffer, recvMsgSize);
+      request = string(safeBuffer, recvMsgSize);
 
       if(request == "list"){
           globalServer->sendDirectoryFileList(sock);
@@ -151,7 +150,7 @@ void HandleTCPClient(TCPSocket *sock) {
       cerr << GlobalErrorTable::GENERIC_ERROR << " :: " << e.what() << endl;
   }
 
-  delete[] buffer;
+  delete[] safeBuffer;
   // Destructor closes socket
 }
 
