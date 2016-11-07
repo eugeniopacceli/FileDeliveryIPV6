@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     struct {
         string          command;
         string          server;
-        int				port;
+        int                port;
         int             buffer;
         string          file;
     } options;
@@ -83,61 +83,61 @@ int main(int argc, char *argv[]) {
     }
 
     /*if the program is running without options ,it will show the usgage and exit*/
-	if(argc  == optind)
-	{
-		cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
-		GlobalErrorTable::showClientHelpAndExit(argv[0]);
-	}
-
-	options.command = argv[optind];
-	int idx = 1;
-
-	if(!options.command.compare("get")) {
-		if((optflag && (argc-optind < 2)) || (!optflag && (argc-optind < 5)))
-		{
-			cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
-			GlobalErrorTable::showClientHelpAndExit(argv[0]);
-		}
-		options.file = argv[optind+1];
-		idx = 2;
-	} else {
-		//checking if command is valid, if different from list exit
-		if(options.command.compare("list")) {
-			cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
-			GlobalErrorTable::showClientHelpAndExit(argv[0]);
-		}
-	}		
-
-    if(!optflag) {
-		if((argc-optind) < 4 || (argc-optind) > 5) {	 
-			cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
-			GlobalErrorTable::showClientHelpAndExit(argv[0]);
-		}
-
-		options.server = argv[optind+idx];
-		idx++;
-		options.port = atoi(argv[optind+idx]);
-		idx++;
-		options.buffer = atoi(argv[optind+idx]);
+    if(argc  == optind)
+    {
+        cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
+        GlobalErrorTable::showClientHelpAndExit(argv[0]);
     }
 
-	try {
-		// Connect to the server.
-		FileDeliveryIPV6Client client(options.server, options.port, options.buffer);
+    options.command = argv[optind];
+    int idx = 1;
 
-		if(!options.command.compare("list")) {
-			//send commad list to server
-			client << "list";
-			client.listDir();
-		} else {
-			client << "get " + options.file;
-			client.writeFile(options.file);
-		}
+    if(!options.command.compare("get")) {
+        if((optflag && (argc-optind < 2)) || (!optflag && (argc-optind < 5)))
+        {
+            cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
+            GlobalErrorTable::showClientHelpAndExit(argv[0]);
+        }
+        options.file = argv[optind+1];
+        idx = 2;
+    } else {
+        //checking if command is valid, if different from list exit
+        if(options.command.compare("list")) {
+            cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
+            GlobalErrorTable::showClientHelpAndExit(argv[0]);
+        }
+    }        
 
-	}
-	catch(SocketException &e) {
-		cerr << e.what() << endl;
-	}
+    if(!optflag) {
+        if((argc-optind) < 4 || (argc-optind) > 5) {     
+            cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
+            GlobalErrorTable::showClientHelpAndExit(argv[0]);
+        }
 
-	return 0;
+        options.server = argv[optind+idx];
+        idx++;
+        options.port = atoi(argv[optind+idx]);
+        idx++;
+        options.buffer = atoi(argv[optind+idx]);
+    }
+
+    try {
+        // Connect to the server.
+        FileDeliveryIPV6Client client(options.server, options.port, options.buffer);
+
+        if(!options.command.compare("list")) {
+            //send commad list to server
+            client << "list";
+            client.listDir();
+        } else {
+            client << "get " + options.file;
+            client.writeFile(options.file);
+        }
+
+    }
+    catch(SocketException &e) {
+        cerr << e.what() << endl;
+    }
+
+    return 0;
 }

@@ -39,7 +39,7 @@ public:
             throw SocketException("Failed of accept (accept())", true);
         }
 
-		inet_ntop(AF_INET6, &(addr.sin6_addr),client_addr_ipv6, sizeof(client_addr_ipv6));
+        inet_ntop(AF_INET6, &(addr.sin6_addr),client_addr_ipv6, sizeof(client_addr_ipv6));
         
         return new TCPSocket(newsockfd);
     }
@@ -49,7 +49,7 @@ private:
     /**
     *
     */
-	char client_addr_ipv6[INET6_ADDRSTRLEN];
+    char client_addr_ipv6[INET6_ADDRSTRLEN];
 
     /**
     *
@@ -60,6 +60,6 @@ private:
             throw SocketException("listen in socket failed (listen())", true);
         }
     }
-	
+    
 };
 #endif

@@ -75,11 +75,11 @@ public:
     }
 
     static void showClientHelpAndExit(char *s){
-	    cerr << endl;
-	    cerr << "   Usage:   " << s << " { list | get <file> } <server> <port> <buffer_size>" << endl;
-	    cerr << "   or     :   " << s << " { list | get <file> } -o [-option] [argument]" << endl;
-	    cerr << "   option:  " << "-h  show help information (this message) and exit" << endl;
-	    cerr << "            " << "-s  server" << endl;
+        cerr << endl;
+        cerr << "   Usage:   " << s << " { list | get <file> } <server> <port> <buffer_size>" << endl;
+        cerr << "   or     :   " << s << " { list | get <file> } -o [-option] [argument]" << endl;
+        cerr << "   option:  " << "-h  show help information (this message) and exit" << endl;
+        cerr << "            " << "-s  server" << endl;
         cerr << "            " << "-p  port" << endl;
         cerr << "            " << "-b  buffer size" << endl;
         cerr << "            " << "-f  file name" << endl;

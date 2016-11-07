@@ -94,10 +94,10 @@ public:
         
         struct sockaddr_in6 localAddr;
         //memset(&localAddr,'\0' , sizeof(localAddr));
-		bzero((char *) &localAddr, sizeof(localAddr));
-		localAddr.sin6_flowinfo = 0;
+        bzero((char *) &localAddr, sizeof(localAddr));
+        localAddr.sin6_flowinfo = 0;
         localAddr.sin6_family = AF_INET6;
-		localAddr.sin6_addr = in6addr_any;
+        localAddr.sin6_addr = in6addr_any;
         localAddr.sin6_port = htons(0);
         //localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
@@ -111,14 +111,14 @@ public:
     void bind(int localPort) throw(SocketException) {
 
         struct sockaddr_in6 localAddr;
-		//bzero((char *) &localAddr, sizeof(localAddr));
+        //bzero((char *) &localAddr, sizeof(localAddr));
         memset(&localAddr,'\0' , sizeof(localAddr));
-		localAddr.sin6_flowinfo = 0;
-    	localAddr.sin6_family = AF_INET6;
-   	    localAddr.sin6_addr = in6addr_any;
- 	    localAddr.sin6_port = htons(localPort);
+        localAddr.sin6_flowinfo = 0;
+        localAddr.sin6_family = AF_INET6;
+           localAddr.sin6_addr = in6addr_any;
+         localAddr.sin6_port = htons(localPort);
 
-		if (::bind(sockfd, (struct sockaddr *) &localAddr, sizeof(localAddr)) < 0) {
+        if (::bind(sockfd, (struct sockaddr *) &localAddr, sizeof(localAddr)) < 0) {
             throw SocketException("Set of local port failed (bind())", true);
         }    
     }
@@ -130,8 +130,8 @@ public:
 
         struct sockaddr_in6 localAddr;
         //memset(&localAddr,'\0' , sizeof(localAddr));
-		bzero((char *) &localAddr, sizeof(localAddr));
-		localAddr.sin6_flowinfo = 0;
+        bzero((char *) &localAddr, sizeof(localAddr));
+        localAddr.sin6_flowinfo = 0;
         localAddr.sin6_family = AF_INET6;
         struct hostent *host;
 
@@ -140,7 +140,7 @@ public:
         }
 
         localAddr.sin6_port = htons(localPort);
-		memmove((char *) &localAddr.sin6_addr.s6_addr, (char *) host->h_addr, host->h_length);
+        memmove((char *) &localAddr.sin6_addr.s6_addr, (char *) host->h_addr, host->h_length);
         //localAddr.sin_addr = *((struct in_addr *)host->h_addr_list[0]);
 
         if(::bind(sockfd, (sockaddr *) &localAddr, sizeof(sockaddr)) < 0) {

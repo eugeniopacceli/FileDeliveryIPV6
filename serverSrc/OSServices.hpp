@@ -42,30 +42,30 @@ class OSServices {
 private:
 
 public:
-	static string getDirectoryFilesList(string directory) {
-	    char buffer[4096];
-	    string dirProcess = "dir -A -l -h " + directory;
-	    string result = "";
-	    FILE* pipe = popen(dirProcess.c_str(), "r");
-	    if (!pipe) throw std::runtime_error(GlobalErrorTable::GENERIC_ERROR);
-	    while (!feof(pipe)) {
-	        if (fgets(buffer, 4096, pipe) != NULL)
-	            result += buffer;
-	    }
-	    pclose(pipe);
-	    return result;
-	}
+    static string getDirectoryFilesList(string directory) {
+        char buffer[4096];
+        string dirProcess = "dir -A -l -h " + directory;
+        string result = "";
+        FILE* pipe = popen(dirProcess.c_str(), "r");
+        if (!pipe) throw std::runtime_error(GlobalErrorTable::GENERIC_ERROR);
+        while (!feof(pipe)) {
+            if (fgets(buffer, 4096, pipe) != NULL)
+                result += buffer;
+        }
+        pclose(pipe);
+        return result;
+    }
 
-	static string trimDirString(string& str){
-		if (str.length() == 0) return "";
-	    size_t first = str.find_first_not_of(' ');
-	    size_t last = str.find_last_not_of(' ');
-	    str = str.substr(first, (last-first+1));
-	    if(str.at(str.length() - 1) != '/'){
-	    	str += '/';
-	    }
-	    return str;
-	}
+    static string trimDirString(string& str){
+        if (str.length() == 0) return "";
+        size_t first = str.find_first_not_of(' ');
+        size_t last = str.find_last_not_of(' ');
+        str = str.substr(first, (last-first+1));
+        if(str.at(str.length() - 1) != '/'){
+            str += '/';
+        }
+        return str;
+    }
 
 };
 

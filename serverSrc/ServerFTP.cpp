@@ -42,23 +42,24 @@ void HandleTCPClient(TCPSocket *sock);     // TCP client handling function
 void *ThreadMain(void *arg);               // Main program of a thread 
 
 typedef struct {
-        int				 port;
+        int                 port;
         int              buffer;
         string           dir;
     } Options;
 
+TCPServerSocket* servSock;
 FileDeliveryIPV6Server* globalServer;
 Options globalOptions;
 
 void signalHandler( int signum ) {
     cout << "Interrupt signal (" << signum << ") received.\n";
-    //if(serverSocket) delete serverSocket;
+    if(servSock) delete servSock;
     exit(signum);
 }
 
 int main(int argc, char *argv[]) {
 
-	signal( SIGINT, signalHandler);
+    signal( SIGINT, signalHandler);
 
     /*set default options*/
 
@@ -91,36 +92,36 @@ int main(int argc, char *argv[]) {
     }
 
     if(!optflag) {
-		/*if the program is running without options ,it will show the usgage and exit*/
-		if(argc  == optind){
-			GlobalErrorTable::showServerHelpAndExit(argv[0]);
-		}
+        /*if the program is running without options ,it will show the usgage and exit*/
+        if(argc  == optind){
+            GlobalErrorTable::showServerHelpAndExit(argv[0]);
+        }
 
         globalOptions.port = atoi(argv[optind]);
         globalOptions.buffer = atoi(argv[optind+1]);
         globalOptions.dir = argv[optind+2];
     }
 
-	try {
-    	globalServer = new FileDeliveryIPV6Server(globalOptions.buffer, globalOptions.dir);
-		TCPServerSocket servSock(globalOptions.port);   // Socket descriptor for server  
-	  
-		for (;;) {      // Run forever  
-		  // Create separate memory for client argument  
-		  TCPSocket *clntSock = servSock.accept();
-	  
-		  // Create client thread  
-		  pthread_t threadID;              // Thread ID from pthread_create()  
-		  if (pthread_create(&threadID, NULL, ThreadMain, 
-				  (void *) clntSock) != 0) {
-			cerr << "Unable to create thread" << endl;
-			exit(1);
-		  }
-		}
-	  } catch (SocketException &e) {
-		cerr << e.what() << endl;
-		exit(1);
-	  }
+    try {
+        globalServer = new FileDeliveryIPV6Server(globalOptions.buffer, globalOptions.dir);
+        servSock = new TCPServerSocket(globalOptions.port);   // Socket descriptor for server  
+
+        for (;;) {      // Run forever  
+          // Create separate memory for client argument  
+          TCPSocket *clntSock = servSock->accept();
+      
+          // Create client thread  
+          pthread_t threadID;              // Thread ID from pthread_create()  
+          if (pthread_create(&threadID, NULL, ThreadMain, 
+                  (void *) clntSock) != 0) {
+            cerr << GlobalErrorTable::POINTER_ERROR << " :: " << GlobalErrorTable::POINTER_ERROR_DESC << endl;
+            exit(1);
+          }
+        }
+      } catch (SocketException &e) {
+        cerr << e.what() << endl;
+        exit(1);
+      }
 
     delete globalServer;
     return 0;
@@ -135,15 +136,10 @@ void HandleTCPClient(TCPSocket *sock) {
   int recvMsgSize;
   string request;
   try {
-#if 0
-	  while ((recvMsgSize = sock->recv(buffer, globalOptions.buffer)) > 0) { // Zero means// end of transmission
-		request.append(buffer, recvMsgSize);
-	  }
-#endif
-	  recvMsgSize = sock->recv(buffer, globalOptions.buffer);
-	  cout << buffer << endl;
+      recvMsgSize = sock->recv(buffer, globalOptions.buffer);
+      cout << buffer << endl;
 
-	  request = string(buffer, recvMsgSize);
+      request = string(buffer, recvMsgSize);
 
       if(request == "list"){
           globalServer->sendDirectoryFileList(sock);
@@ -152,7 +148,7 @@ void HandleTCPClient(TCPSocket *sock) {
           globalServer->sendFile(request.substr(4,string::npos),sock);
       }
   } catch (exception &e) {
-  	cerr << GlobalErrorTable::GENERIC_ERROR << " :: " << e.what() << endl;
+      cerr << GlobalErrorTable::GENERIC_ERROR << " :: " << e.what() << endl;
   }
 
   delete[] buffer;
@@ -167,6 +163,6 @@ void *ThreadMain(void *clntSock) {
   HandleTCPClient((TCPSocket *) clntSock);
 
   delete (TCPSocket *) clntSock;
-  return NULL;
+  pthread_exit(0);
 }
 

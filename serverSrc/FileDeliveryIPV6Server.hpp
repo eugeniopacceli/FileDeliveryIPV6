@@ -85,11 +85,11 @@ public:
     }
 
     streamsize getBufferSize(){
-    	return this->bufferSize;
+        return this->bufferSize;
     }
 
     string getDirecoryAddr(){
-    	return this->directoryAddr;
+        return this->directoryAddr;
     }
 
     ~FileDeliveryIPV6Server(){

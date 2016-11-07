@@ -21,7 +21,7 @@ public:
 
         struct sockaddr_in6 foreignAddr;
         memset(&foreignAddr,'\0' , sizeof(foreignAddr));
-		foreignAddr.sin6_flowinfo = 0;
+        foreignAddr.sin6_flowinfo = 0;
         foreignAddr.sin6_family = AF_INET6;
         struct hostent *host;
 
@@ -30,7 +30,7 @@ public:
         }
 
         foreignAddr.sin6_port = htons(destPort);
-		memmove((char *) &foreignAddr.sin6_addr.s6_addr, (char *) host->h_addr, host->h_length);
+        memmove((char *) &foreignAddr.sin6_addr.s6_addr, (char *) host->h_addr, host->h_length);
         //foreignAddr.sin_addr = *((struct in_addr *)host->h_addr_list[0]);
 
         if((::connect(sockfd, (sockaddr *) &foreignAddr, sizeof(foreignAddr))) < 0) {
@@ -89,19 +89,19 @@ public:
     *
     */
     size_t recvFully(void *buffer, int bufferLen) 
-	    throw(SocketException) {
-	    int rcount = 0;
-	    int len = ::recv(sockfd, (void *)buffer, bufferLen, 0);
+        throw(SocketException) {
+        int rcount = 0;
+        int len = ::recv(sockfd, (void *)buffer, bufferLen, 0);
         while (len > 0 && rcount + len < bufferLen) {
-	        rcount += len;
-	        len = ::recv(sockfd, (void *) (((char *) buffer) + rcount), 
-	                     bufferLen - rcount, 0);
-	    }
+            rcount += len;
+            len = ::recv(sockfd, (void *) (((char *) buffer) + rcount), 
+                         bufferLen - rcount, 0);
+        }
 
-	    if (len < 0)
-	        throw SocketException("Receive failed (recv())");
+        if (len < 0)
+            throw SocketException("Receive failed (recv())");
 
-	    return rcount + len;
+        return rcount + len;
     }
 
 

@@ -47,7 +47,7 @@ class FileDeliveryIPV6Client {
 public:
     FileDeliveryIPV6Client(string server, int port, int buffersize):
         socket(server, port), sbuffer(buffersize) {
-        buffer = new char[sbuffer + sizeof(size_t) + sizeof(bool)]();
+        buffer = new char[sbuffer]();
     }
 
     ~FileDeliveryIPV6Client() {
@@ -60,10 +60,10 @@ public:
     }
 
     void listDir() {
-		int recvMsgSize;
-		while ((recvMsgSize = socket.recv(buffer, sbuffer)) > 0) { // Zero means
+        int recvMsgSize;
+        while ((recvMsgSize = socket.recv(buffer, sbuffer)) > 0) { // Zero means stop
            cout << string(buffer, recvMsgSize);
-		}
+        }
     }
 
     void writeFile(string fileName) {
@@ -75,8 +75,8 @@ public:
         bool possibleNotFound = false;
         start = clock();
 
-		int recvMsgSize;
-		while ((recvMsgSize = socket.recv(buffer, sbuffer)) > 0) { // Zero means
+        int recvMsgSize;
+        while ((recvMsgSize = socket.recv(buffer, sbuffer)) > 0) { // Zero means stop
             if(totalCount == 0){
                 if(recvMsgSize == 1 && buffer[0] == '0'){
                     possibleNotFound = true;
@@ -85,7 +85,7 @@ public:
             destiny->write(buffer, recvMsgSize);
             totalBytes += recvMsgSize;
             totalCount++;
-		}
+        }
         destiny->close();
 
         if(totalCount == 1 && possibleNotFound){
