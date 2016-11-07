@@ -64,7 +64,7 @@ public:
 		while(!done) {
 			package = socket.receiveFormatted((void *)buffer, sbuffer + sizeof(bool) + sizeof(size_t));
 			done = package.packageLen < sbuffer || package.packageLen == 0;
-			cout << string(package.buffer);
+			cout << string(package.buffer, package.packageLen);
 		}
 	}
 

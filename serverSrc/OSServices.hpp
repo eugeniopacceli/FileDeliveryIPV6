@@ -55,6 +55,18 @@ public:
 	    pclose(pipe);
 	    return result;
 	}
+
+	static string trimDirString(string& str){
+		if (str.length() == 0) return "";
+	    size_t first = str.find_first_not_of(' ');
+	    size_t last = str.find_last_not_of(' ');
+	    str = str.substr(first, (last-first+1));
+	    if(str.at(str.length() - 1) != '/'){
+	    	str += '/';
+	    }
+	    return str;
+	}
+
 };
 
 #endif
