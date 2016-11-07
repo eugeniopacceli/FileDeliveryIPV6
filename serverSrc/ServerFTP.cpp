@@ -1,18 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <pthread.h>
+#include <csignal>
 #include "../socketAPI/TCPServerSocket.hpp"
 #include "../socketAPI/GlobalErrorTable.hpp"
 #include "FileDeliveryIPV6Server.hpp"
 //#include "../socketAPI/CommunicatingService.h"
 
 using namespace std;
-
-void signalHandler( int signum ) {
-	cout << "Interrupt signal (" << signum << ") received.\n";
-	delete 
-	exit(signum);
-}
 
 //thread main function
 static void *HandleTCPClient(void *arg);
@@ -23,8 +18,15 @@ typedef struct {
         string           dir;
     } Options;
 
+TCPServerSocket* serverSocket;
 FileDeliveryIPV6Server* globalServer;
 Options globalOptions;
+
+void signalHandler( int signum ) {
+    cout << "Interrupt signal (" << signum << ") received.\n";
+    if(serverSocket) delete serverSocket;
+    exit(signum);
+}
 
 int main(int argc, char *argv[]) {
 
@@ -72,10 +74,10 @@ int main(int argc, char *argv[]) {
     }
 
    try {
-        TCPServerSocket serverSocket(globalOptions.port);
+        serverSocket = new TCPServerSocket(globalOptions.port);
         globalServer = new FileDeliveryIPV6Server(globalOptions.buffer, globalOptions.dir);
         for(;;) {
-			TCPSocket *sock = serverSocket.accept();
+			TCPSocket *sock = serverSocket->accept();
 			pthread_t newThread; // Give client in a separate thread
 			if (pthread_create(&newThread, NULL, HandleTCPClient, sock) != 0) {
 				cerr << GlobalErrorTable::GENERIC_ERROR << endl;
