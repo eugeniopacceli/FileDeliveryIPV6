@@ -38,8 +38,8 @@
 
 using namespace std;
 
-//thread main function
-static void *HandleTCPClient(void *arg);
+void HandleTCPClient(TCPSocket *sock);     // TCP client handling function
+void *ThreadMain(void *arg);               // Main program of a thread 
 
 typedef struct {
         int				 port;
@@ -47,13 +47,12 @@ typedef struct {
         string           dir;
     } Options;
 
-TCPServerSocket* serverSocket;
 FileDeliveryIPV6Server* globalServer;
 Options globalOptions;
 
 void signalHandler( int signum ) {
     cout << "Interrupt signal (" << signum << ") received.\n";
-    if(serverSocket) delete serverSocket;
+    //if(serverSocket) delete serverSocket;
     exit(signum);
 }
 
@@ -102,42 +101,72 @@ int main(int argc, char *argv[]) {
         globalOptions.dir = argv[optind+2];
     }
 
-   try {
-        serverSocket = new TCPServerSocket(globalOptions.port);
-        globalServer = new FileDeliveryIPV6Server(globalOptions.buffer, globalOptions.dir);
-        for(;;) {
-			TCPSocket *sock = serverSocket->accept();
-			pthread_t newThread; // Give client in a separate thread
-			if (pthread_create(&newThread, NULL, HandleTCPClient, sock) != 0) {
-				cerr << GlobalErrorTable::GENERIC_ERROR << endl;
-                delete sock;
-			}
-        }
-    }catch(SocketException &e) {
-        cerr << GlobalErrorTable::SOCKET_ERROR << " :: " << e.what() << endl;
-    }
+	try {
+    	globalServer = new FileDeliveryIPV6Server(globalOptions.buffer, globalOptions.dir);
+		TCPServerSocket servSock(globalOptions.port);   // Socket descriptor for server  
+	  
+		for (;;) {      // Run forever  
+		  // Create separate memory for client argument  
+		  TCPSocket *clntSock = servSock.accept();
+	  
+		  // Create client thread  
+		  pthread_t threadID;              // Thread ID from pthread_create()  
+		  if (pthread_create(&threadID, NULL, ThreadMain, 
+				  (void *) clntSock) != 0) {
+			cerr << "Unable to create thread" << endl;
+			exit(1);
+		  }
+		}
+	  } catch (SocketException &e) {
+		cerr << e.what() << endl;
+		exit(1);
+	  }
 
     delete globalServer;
     return 0;
 }
 
-static void *HandleTCPClient(void *arg) {
-	TCPSocket *sock = (TCPSocket *)arg;
-    char* buffer = new char[globalOptions.buffer]();
-    PackageFormat package;
-    string request;
-	try {
-        package = sock->receiveFormatted(buffer,globalOptions.buffer);
-        request = string(package.buffer);
-        if(request == "list"){
-            globalServer->sendDirectoryFileList(sock);
-        }else if(request.substr(0,3) == "get"){
-            // get FILE_NAME, the first letter of the file is the 4th character.
-            globalServer->sendFile(request.substr(4,string::npos),sock);
-        }
-	} catch (exception &e) {
-		cerr << GlobalErrorTable::GENERIC_ERROR << " :: " << e.what() << endl;
-	}
-    delete[] buffer;
-	pthread_exit(0);
+// TCP client handling function
+void HandleTCPClient(TCPSocket *sock) {
+  cout << "Handling client ";
+  cout << " with thread " << pthread_self() << endl;
+
+  char* buffer = new char[globalOptions.buffer]();
+  int recvMsgSize;
+  string request;
+  try {
+#if 0
+	  while ((recvMsgSize = sock->recv(buffer, globalOptions.buffer)) > 0) { // Zero means// end of transmission
+		request.append(buffer, recvMsgSize);
+	  }
+#endif
+	  recvMsgSize = sock->recv(buffer, globalOptions.buffer);
+	  cout << buffer << endl;
+
+	  request = string(buffer, recvMsgSize);
+
+      if(request == "list"){
+          globalServer->sendDirectoryFileList(sock);
+      }else if(request.substr(0,3) == "get"){
+          // get FILE_NAME, the first letter of the file is the 4th character.
+          globalServer->sendFile(request.substr(4,string::npos),sock);
+      }
+  } catch (exception &e) {
+  	cerr << GlobalErrorTable::GENERIC_ERROR << " :: " << e.what() << endl;
+  }
+
+  delete[] buffer;
+  // Destructor closes socket
 }
+
+void *ThreadMain(void *clntSock) {
+  // Guarantees that thread resources are deallocated upon return  
+  pthread_detach(pthread_self()); 
+
+  // Extract socket file descriptor from argument  
+  HandleTCPClient((TCPSocket *) clntSock);
+
+  delete (TCPSocket *) clntSock;
+  return NULL;
+}
+

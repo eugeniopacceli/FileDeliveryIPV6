@@ -56,36 +56,31 @@ public:
     
     void operator<<(string command) {
         //send commad to server
-        socket.sendFormatted(command.c_str(), command.length(), true);
+        socket.send(command.c_str(), command.length());
     }
 
     void listDir() {
-        bool done = false;
-        PackageFormat package;
-
-        while(!done) {
-            package = socket.receiveFormatted((void *)buffer, sbuffer + sizeof(bool) + sizeof(size_t));
-            done = package.packageLen < sbuffer || package.packageLen == 0;
-            cout << string(package.buffer, package.packageLen);
-        }
+		int recvMsgSize;
+		while ((recvMsgSize = socket.recv(buffer, sbuffer)) > 0) { // Zero means
+           cout << string(buffer, recvMsgSize);
+		}
     }
 
     void writeFile(string fileName) {
         ofstream* destiny = new ofstream(fileName,ios::binary | ios::trunc);
         bool done = false;
-        PackageFormat package;
         size_t totalBytes = 0;
         clock_t start;
         double duration;
 
         start = clock();
 
-        while(!done) {
-            package = socket.receiveFormatted((void *)buffer, sbuffer + sizeof(bool) + sizeof(size_t));
-            done = package.packageLen < sbuffer || package.packageLen == 0;
-            destiny->write(package.buffer, package.packageLen);
-            totalBytes += package.packageLen;
-        }
+		int recvMsgSize;
+		while ((recvMsgSize = socket.recv(buffer, sbuffer)) > 0) { // Zero means
+            destiny->write(buffer, recvMsgSize);
+            totalBytes += recvMsgSize;
+		}
+
         destiny->close();
 
         duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;

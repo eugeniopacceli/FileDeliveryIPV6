@@ -57,11 +57,9 @@ public:
         }
         while(!ok){
             ok = bufferSize >= dirContent.length() - offset;
-            sendSocket->sendFormatted(dirContent.substr(offset, bufferSize).c_str(), ok ? dirContent.length() - offset : bufferSize, ok);
+            sendSocket->send(dirContent.substr(offset, bufferSize).c_str(), dirContent.length() - offset);
             offset += bufferSize;
         }
-        sendSocket->sendFormatted("\0", 0 , ok);
-        delete sendSocket;
     }
 
     void sendFile(string file, ChannelSocket *sendSocket){
@@ -73,12 +71,10 @@ public:
             input->read(buffer,bufferSize);
             ok = !input->eof();
             bytesRead = input->gcount();
-            sendSocket->sendFormatted(buffer, (size_t)bytesRead, ok);
+            sendSocket->send(buffer, (size_t)bytesRead);
         }
-        sendSocket->sendFormatted("\0", 0 , ok);
         input->close();
         delete input;
-        delete sendSocket;
         delete[] buffer;
     }
 

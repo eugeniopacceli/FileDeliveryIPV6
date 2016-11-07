@@ -70,28 +70,6 @@ public:
         return n == -1?-1:total;
     }
 
-    /**
-    *
-    */
-    int sendFormatted(const void *buffer, int bufferLen, bool isFinal) throw(SocketException) {
-        size_t firstOffset = sizeof(size_t);
-        size_t secondOffset = sizeof(bool);
-        size_t bufferSize = bufferLen;
-        size_t totalSize = bufferSize + firstOffset + secondOffset;
-
-        char* totalBuffer = new char[totalSize]();
-        
-        memcpy(totalBuffer, &bufferSize, firstOffset);
-        memcpy(totalBuffer + firstOffset, &isFinal, secondOffset);
-        memcpy(totalBuffer + firstOffset + secondOffset, buffer, bufferSize);
-        int sndl;
-
-        if((sndl = send((void *)totalBuffer, totalSize) < 0)) {
-            throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
-        } 
-
-        return sndl;
-    }
 
     /**
     *
@@ -126,27 +104,6 @@ public:
 	    return rcount + len;
     }
 
-    /**
-    *
-    */
-    PackageFormat receiveFormatted(const void *buffer, int bufferLen) throw(SocketException) {
-        int rcvt;
-        size_t firstOffset = sizeof(size_t);
-        size_t secondOffset = sizeof(bool);
-        size_t bufferSize;
-        bool isFinal;
-        char* receivedBuffer;
-
-        if((rcvt = recv((void *)buffer, bufferLen)) < 0) {
-            throw SocketException(GlobalErrorTable::SOCKET_ERROR, true);
-        }
-
-        bufferSize = *((size_t*)buffer);
-        isFinal = *((bool*)buffer+firstOffset);
-        receivedBuffer = (char*)buffer + firstOffset + secondOffset;
-        
-        return { bufferSize, isFinal, receivedBuffer};
-    }
 
 #if 0
     /**
