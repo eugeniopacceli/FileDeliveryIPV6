@@ -89,8 +89,12 @@ public:
         destiny->close();
 
         duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+        if(totalBytes > 0 ){
         printf("Arquivo %s\tBuffer %lu bytes, %10.2f kbps (%lu bytes em %.6lf s)\n",
                                 fileName.c_str(), totalBytes, totalBytes/duration, totalBytes, duration);
+        } else {
+            cerr << GlobalErrorTable::FILE_NOT_FOUND_ERROR << " :: " << GlobalErrorTable::FILE_NOT_FOUND_ERROR_DESC << endl;
+        }
         delete destiny;
     }
 

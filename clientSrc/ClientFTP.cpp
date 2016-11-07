@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
     /*if the program is running without options ,it will show the usgage and exit*/
 	if(argc  == optind)
 	{
-		cerr << "missing commands" << endl;
+		cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
 		GlobalErrorTable::showClientHelpAndExit(argv[0]);
 	}
 
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 	if(!options.command.compare("get")) {
 		if((optflag && (argc-optind < 2)) || (!optflag && (argc-optind < 5)))
 		{
-			cerr << "missing filename" << endl;
+			cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
 			GlobalErrorTable::showClientHelpAndExit(argv[0]);
 		}
 		options.file = argv[optind+1];
@@ -103,14 +103,14 @@ int main(int argc, char *argv[]) {
 	} else {
 		//checking if command is valid, if different from list exit
 		if(options.command.compare("list")) {
-			cerr << "error in command passed" << endl;
+			cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
 			GlobalErrorTable::showClientHelpAndExit(argv[0]);
 		}
 	}		
 
     if(!optflag) {
 		if((argc-optind) < 4 || (argc-optind) > 5) {	 
-			cerr << "wrong number of command passed" << endl;
+			cerr << GlobalErrorTable::ARG_ERROR << " :: " << GlobalErrorTable::ARG_ERROR_DESC << endl;
 			GlobalErrorTable::showClientHelpAndExit(argv[0]);
 		}
 
