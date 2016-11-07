@@ -56,7 +56,7 @@ public:
     
     void operator<<(string command) {
         //send commad to server
-        socket.send(command.c_str(), command.length());
+        socket.sendall(command.c_str(), command.length());
     }
 
     void listDir() {

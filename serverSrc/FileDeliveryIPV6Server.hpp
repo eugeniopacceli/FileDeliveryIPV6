@@ -57,7 +57,7 @@ public:
         }
         while(!ok){
             ok = bufferSize >= dirContent.length() - offset;
-            sendSocket->send(dirContent.substr(offset, bufferSize).c_str(), dirContent.length() - offset);
+            sendSocket->sendall(dirContent.substr(offset, bufferSize).c_str(), dirContent.length() - offset);
             offset += bufferSize;
         }
     }
@@ -71,7 +71,7 @@ public:
             input->read(buffer,bufferSize);
             ok = !input->eof();
             bytesRead = input->gcount();
-            sendSocket->send(buffer, (size_t)bytesRead);
+            sendSocket->sendall(buffer, (size_t)bytesRead);
         }
         input->close();
         delete input;
