@@ -67,6 +67,12 @@ public:
         bool ok = true;
         streamsize bytesRead;
         char* buffer = new char[bufferSize]();
+
+        if(input->fail()){
+            sendSocket->sendall("0",(size_t)1);
+            ok = false;
+        }
+
         while(ok){
             input->read(buffer,bufferSize);
             ok = !input->eof();

@@ -68,27 +68,32 @@ public:
 
     void writeFile(string fileName) {
         ofstream* destiny = new ofstream(fileName,ios::binary | ios::trunc);
-        bool done = false;
         size_t totalBytes = 0;
         clock_t start;
         double duration;
-
+        size_t totalCount = 0;
+        bool possibleNotFound = false;
         start = clock();
 
 		int recvMsgSize;
 		while ((recvMsgSize = socket.recv(buffer, sbuffer)) > 0) { // Zero means
+            if(totalCount == 0){
+                if(recvMsgSize == 1 && buffer[0] == '0'){
+                    possibleNotFound = true;
+                }
+            }
             destiny->write(buffer, recvMsgSize);
             totalBytes += recvMsgSize;
+            totalCount++;
 		}
-
         destiny->close();
 
-        duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
-        if(totalBytes > 0 ){
-        printf("Arquivo %s\tBuffer %lu bytes, %10.2f kbps (%lu bytes em %.6lf s)\n",
-                                fileName.c_str(), totalBytes, totalBytes/duration, totalBytes, duration);
-        } else {
+        if(totalCount == 1 && possibleNotFound){
             cerr << GlobalErrorTable::FILE_NOT_FOUND_ERROR << " :: " << GlobalErrorTable::FILE_NOT_FOUND_ERROR_DESC << endl;
+        } else {
+            duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+            printf("Arquivo %s\tBuffer %lu bytes, %10.2f kbps (%lu bytes em %.6lf s)\n",
+                                fileName.c_str(), totalBytes, totalBytes/duration, totalBytes, duration);
         }
         delete destiny;
     }
