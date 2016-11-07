@@ -45,7 +45,7 @@ using namespace std;
 class FileDeliveryIPV6Client {
 
 public:
-    FileDeliveryIPV6Client(string server, unsigned short port, int buffersize):
+    FileDeliveryIPV6Client(string server, int port, int buffersize):
         socket(server, port), sbuffer(buffersize) {
         buffer = new char[sbuffer + sizeof(size_t) + sizeof(bool)]();
     }

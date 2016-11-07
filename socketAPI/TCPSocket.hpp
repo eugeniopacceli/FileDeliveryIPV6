@@ -11,13 +11,13 @@ public:
 	/**
 	*
 	*/
-	TCPSocket() throw(SocketException): ChannelSocket(AF_INET, SOCK_STREAM, 0) {
+	TCPSocket() throw(SocketException): ChannelSocket(SOCK_STREAM, 0) {
 	}
 	
 	/**
 	*
 	*/
-	TCPSocket(const string &foreignAddress, unsigned short foreignPort) throw(SocketException): ChannelSocket(AF_INET, SOCK_STREAM, 0) {
+	TCPSocket(const string &foreignAddress, int foreignPort) throw(SocketException): ChannelSocket(SOCK_STREAM, 0) {
 		connect(foreignAddress, foreignPort);
 	}
 

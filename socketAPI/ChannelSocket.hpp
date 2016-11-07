@@ -16,20 +16,22 @@ public:
 
     /**
     *
-    */
-    void connect(const string &destAddress, unsigned short destPort) throw(SocketException) {
+    *///ok ipv6
+    void connect(const string &destAddress, int destPort) throw(SocketException) {
 
-        sockaddr_in foreignAddr;
+        struct sockaddr_in6 foreignAddr;
         memset(&foreignAddr,'\0' , sizeof(foreignAddr));
-        foreignAddr.sin_family = AF_INET;
-        hostent *host;
+		foreignAddr.sin6_flowinfo = 0;
+        foreignAddr.sin6_family = AF_INET6;
+        struct hostent *host;
 
-        if((host = gethostbyname(destAddress.c_str())) == NULL) {
+        if((host = gethostbyname2(destAddress.c_str(),AF_INET6)) == NULL) {
             throw SocketException("Failed to resolve name (gethostbyname())");
         }
 
-        foreignAddr.sin_port = htons(destPort);
-        foreignAddr.sin_addr = *((struct in_addr *)host->h_addr_list[0]);
+        foreignAddr.sin6_port = htons(destPort);
+		memmove((char *) &foreignAddr.sin6_addr.s6_addr, (char *) host->h_addr, host->h_length);
+        //foreignAddr.sin_addr = *((struct in_addr *)host->h_addr_list[0]);
 
         if((::connect(sockfd, (sockaddr *) &foreignAddr, sizeof(foreignAddr))) < 0) {
             throw SocketException("Failed in trying to connect", true);
@@ -146,6 +148,7 @@ public:
         return { bufferSize, isFinal, receivedBuffer};
     }
 
+#if 0
     /**
     *
     */
@@ -175,13 +178,14 @@ public:
         
         return inet_ntoa(addr.sin_addr);    
     }
+#endif
 
 protected:
 
     /**
     *
     */
-    ChannelSocket(int domain, int type, int protocol) throw(SocketException): Socket(domain, type, protocol) {
+    ChannelSocket(int type, int protocol) throw(SocketException): Socket(type, protocol) {
     }
 
     /**

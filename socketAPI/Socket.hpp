@@ -56,6 +56,8 @@ public:
         ::close(sockfd);
         sockfd = -1;
     }
+
+#if 0
     /**
     *
     */
@@ -83,17 +85,21 @@ public:
         
         return inet_ntoa(addr.sin_addr);    
     }
+#endif
 
     /**
     *
-    */
+    *///ok ipv6
     void bind() throw(SocketException) {
         
-        sockaddr_in localAddr;
-        memset(&localAddr,'\0' , sizeof(localAddr));
-        localAddr.sin_family = AF_INET;
-        localAddr.sin_port = htons(0);
-        localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+        struct sockaddr_in6 localAddr;
+        //memset(&localAddr,'\0' , sizeof(localAddr));
+		bzero((char *) &localAddr, sizeof(localAddr));
+		localAddr.sin6_flowinfo = 0;
+        localAddr.sin6_family = AF_INET6;
+		localAddr.sin6_addr = in6addr_any;
+        localAddr.sin6_port = htons(0);
+        //localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
         if(::bind(sockfd, (sockaddr *) &localAddr, sizeof(sockaddr)) < 0) {
             throw SocketException("Set of port failed (bind())", true);
@@ -101,34 +107,41 @@ public:
     }
     /**
     *
-    */
-    void bind(unsigned short localPort) throw(SocketException) {
-        sockaddr_in localAddr;
-        memset(&localAddr,'\0' , sizeof(localAddr));
-        localAddr.sin_family = AF_INET;
-        localAddr.sin_port = htons(localPort);
-        localAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    *///ok ipv6
+    void bind(int localPort) throw(SocketException) {
 
-        if(::bind(sockfd, (sockaddr *) &localAddr, sizeof(sockaddr)) < 0) {
+        struct sockaddr_in6 localAddr;
+		//bzero((char *) &localAddr, sizeof(localAddr));
+        memset(&localAddr,'\0' , sizeof(localAddr));
+		localAddr.sin6_flowinfo = 0;
+    	localAddr.sin6_family = AF_INET6;
+   	    localAddr.sin6_addr = in6addr_any;
+ 	    localAddr.sin6_port = htons(localPort);
+
+		if (::bind(sockfd, (struct sockaddr *) &localAddr, sizeof(localAddr)) < 0) {
             throw SocketException("Set of local port failed (bind())", true);
         }    
     }
+
     /**
     *
-    */
-    void bind(const string& address , unsigned short localPort) throw(SocketException) {
+    *///ok ipv6
+    void bind(const string& address , int localPort) throw(SocketException) {
 
-        sockaddr_in localAddr;
-        memset(&localAddr,'\0' , sizeof(localAddr));
-        localAddr.sin_family = AF_INET;
-        hostent *host;
+        struct sockaddr_in6 localAddr;
+        //memset(&localAddr,'\0' , sizeof(localAddr));
+		bzero((char *) &localAddr, sizeof(localAddr));
+		localAddr.sin6_flowinfo = 0;
+        localAddr.sin6_family = AF_INET6;
+        struct hostent *host;
 
-        if((host = gethostbyname(address.c_str())) == NULL) {
+        if((host = gethostbyname2(address.c_str(),AF_INET6)) == NULL) {
             throw SocketException("Failed to resolve name (gethostbyname())");
         }
 
-        localAddr.sin_port = htons(localPort);
-        localAddr.sin_addr = *((struct in_addr *)host->h_addr_list[0]);
+        localAddr.sin6_port = htons(localPort);
+		memmove((char *) &localAddr.sin6_addr.s6_addr, (char *) host->h_addr, host->h_length);
+        //localAddr.sin_addr = *((struct in_addr *)host->h_addr_list[0]);
 
         if(::bind(sockfd, (sockaddr *) &localAddr, sizeof(sockaddr)) < 0) {
             throw SocketException("Set of local port and address failed (bind())", true);
@@ -138,9 +151,9 @@ public:
     /**
     *mudar para protected
     */
-    Socket(int domain, int type, int protocol) throw(SocketException) {
+    Socket(int type, int protocol) throw(SocketException) {
         //create a new socket
-        if(((sockfd = socket(domain, type, protocol)) < 0)) {
+        if(((sockfd = socket(AF_INET6, type, protocol)) < 0)) {
             throw SocketException("socket creation failed (socket())", true);
         }
     }

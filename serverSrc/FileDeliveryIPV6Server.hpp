@@ -46,9 +46,7 @@ public:
         this->directoryAddr = directoryAddr;
     }
 
-    //void sendDirectoryFileList(string destiny, unsigned short port){
     void sendDirectoryFileList(ChannelSocket *sendSocket){
-        //TCPSocket* sendSocket = new TCPSocket(destiny,port);
         string dirContent;
         bool ok = false;
         int offset = 0;
@@ -66,10 +64,8 @@ public:
         delete sendSocket;
     }
 
-    //void sendFile(string file,string destiny, unsigned short port){
     void sendFile(string file, ChannelSocket *sendSocket){
         ifstream* input = new ifstream(OSServices::trimDirString(directoryAddr) + file, ios::binary);
-        //TCPSocket* sendSocket = new TCPSocket(destiny,port);
         bool ok = true;
         streamsize bytesRead;
         char* buffer = new char[bufferSize]();

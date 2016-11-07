@@ -42,7 +42,7 @@ using namespace std;
 static void *HandleTCPClient(void *arg);
 
 typedef struct {
-        unsigned short   port;
+        int				 port;
         int              buffer;
         string           dir;
     } Options;
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
                 GlobalErrorTable::showServerHelpAndExit(argv[0]);
                 break;
             case 'p':
-                globalOptions.port = (unsigned short)atoi(optarg);
+                globalOptions.port = atoi(optarg);
                 break;
             case 'b':
                 globalOptions.buffer = atoi(optarg);
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 			GlobalErrorTable::showServerHelpAndExit(argv[0]);
 		}
 
-        globalOptions.port = (unsigned short)atoi(argv[optind]);
+        globalOptions.port = atoi(argv[optind]);
         globalOptions.buffer = atoi(argv[optind+1]);
         globalOptions.dir = argv[optind+2];
     }

@@ -43,7 +43,7 @@ int main(int argc, char *argv[]) {
     struct {
         string          command;
         string          server;
-        unsigned short  port;
+        int				port;
         int             buffer;
         string          file;
     } options;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
                 options.server = optarg;
                 break;
             case 'p':
-                options.port = (unsigned short)atoi(optarg);
+                options.port = atoi(optarg);
                 break;
             case 'b':
                 options.buffer = atoi(optarg);
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
 
 		options.server = argv[optind+idx];
 		idx++;
-		options.port = (unsigned short)atoi(argv[optind+idx]);
+		options.port = atoi(argv[optind+idx]);
 		idx++;
 		options.buffer = atoi(argv[optind+idx]);
     }
